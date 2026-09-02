@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# wrangler local cache/state
+.wrangler
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
