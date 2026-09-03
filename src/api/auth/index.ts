@@ -1,6 +1,11 @@
 import { apiFetch } from '@/lib/api-fetch';
 import { isApiError } from '@/lib/errors/api-error';
 
+export type AuthUser = {
+    login: string;
+    role: 'admin' | 'user';
+};
+
 export interface LoginPayload {
     login: string;
     password: string;
@@ -9,10 +14,13 @@ export interface LoginPayload {
 export interface LoginResponse {
     success: boolean;
     token?: string;
-    user?: {
-        login: string;
-        role: string;
-    };
+    user?: AuthUser;
+    error?: string;
+}
+
+export interface VerifyResponse {
+    success: boolean;
+    user?: AuthUser;
     error?: string;
 }
 
@@ -26,6 +34,21 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(payload),
+            },
+            { skipAuthRedirect: true }
+        );
+    } catch (err) {
+        return { success: false, error: isApiError(err) ? err.message : 'Network error' };
+    }
+}
+
+export async function verifyToken(token: string): Promise<VerifyResponse> {
+    try {
+        return await apiFetch<VerifyResponse>(
+            '/api/auth/verify',
+            {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}` },
             },
             { skipAuthRedirect: true }
         );
