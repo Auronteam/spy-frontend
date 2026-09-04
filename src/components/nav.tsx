@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { ROUTES } from '@/lib/routes';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export const TopNav = () => {
     const { pathname } = useLocation();
@@ -10,6 +12,7 @@ export const TopNav = () => {
         { href: ROUTES.profiles, label: 'Profiles' },
         { href: ROUTES.content, label: 'Content' },
         { href: ROUTES.logs, label: 'Logs' },
+        { href: ROUTES.categories, label: 'Categories' },
         { href: ROUTES.settings, label: 'Settings' },
     ];
 
@@ -21,38 +24,42 @@ export const TopNav = () => {
               : [];
 
     return (
-        <nav className="flex justify-between items-center p-3 border-b border-gray-300">
-            <div className="flex gap-3">
+        <header className="border-b bg-background">
+            <div className="flex items-center justify-between px-6 py-3">
+                <div className="flex items-center gap-2">
+                    <div className="h-6 w-6 rounded-sm bg-foreground" />
+                    <span className="font-semibold">Scanner Console</span>
+                </div>
+
+                {user && (
+                    <div className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground">Hi, {user.login}</span>
+                        <Button variant="outline" size="sm" onClick={logout} disabled={isLoading}>
+                            {isLoading ? 'Logging out...' : 'Log out'}
+                        </Button>
+                    </div>
+                )}
+            </div>
+
+            <nav className="flex gap-6 px-6">
                 {sections.map(s => {
                     const isActive = pathname === s.href;
                     return (
                         <Link
                             key={s.href}
                             to={s.href}
-                            className={`no-underline font-medium ${
+                            className={cn(
+                                'border-b-2 pb-2 text-sm font-medium transition-colors',
                                 isActive
-                                    ? 'text-blue-700 font-bold'
-                                    : 'text-gray-900 hover:text-blue-600'
-                            }`}
+                                    ? 'border-foreground text-foreground'
+                                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                            )}
                         >
                             {s.label}
                         </Link>
                     );
                 })}
-            </div>
-
-            {user && (
-                <div className="flex items-center gap-3">
-                    <span className="text-gray-900 font-medium">Hello, {user.role}!</span>
-                    <button
-                        onClick={logout}
-                        disabled={isLoading}
-                        className="px-3 py-1.5 bg-red-500 text-white border-0 rounded cursor-pointer font-medium hover:bg-red-600 disabled:opacity-50"
-                    >
-                        {isLoading ? 'Logging out...' : 'Log out'}
-                    </button>
-                </div>
-            )}
-        </nav>
+            </nav>
+        </header>
     );
 };
