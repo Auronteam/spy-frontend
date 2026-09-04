@@ -8,6 +8,7 @@ import { LoginPage } from '@/pages/login/login-page';
 import { ContentPage } from '@/pages/content/content-page';
 import { ProfilesPage } from '@/pages/profiles/profiles-page';
 import { LogsPage } from '@/pages/logs/logs-page';
+import { CategoriesPage } from '@/pages/categories/categories-page';
 import { SettingsPage } from '@/pages/settings/settings-page';
 
 export const router = createBrowserRouter([
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
                         children: [
                             { path: ROUTES.profiles, element: <ProfilesPage /> },
                             { path: ROUTES.logs, element: <LogsPage /> },
+                            { path: ROUTES.categories, element: <CategoriesPage /> },
                             { path: ROUTES.settings, element: <SettingsPage /> },
                         ],
                     },
