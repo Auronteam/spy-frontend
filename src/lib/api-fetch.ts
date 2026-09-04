@@ -1,7 +1,8 @@
 import { BACKEND_BASE } from '@/config';
-import { authHeaders } from '@/lib/client-auth';
+import { authHeaders, clearClientAuthToken } from '@/lib/client-auth';
 import { ApiError } from '@/lib/errors/api-error';
 import { captureError } from '@/lib/errors/sentry';
+import { ROUTES } from '@/lib/routes';
 
 type BackendErrorBody = {
     error?: string | { code?: string; message?: string; details?: unknown };
@@ -29,10 +30,10 @@ export async function parseErrorBody(
 // explicit user-initiated logout.
 export function forceLogout(): void {
     if (typeof document !== 'undefined') {
-        document.cookie = 'token=; Max-Age=0; path=/';
+        clearClientAuthToken();
     }
     if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        window.location.href = ROUTES.login;
     }
 }
 
