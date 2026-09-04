@@ -45,13 +45,16 @@ export const LoginPage = () => {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center p-6">
+        <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
+            <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-sm bg-foreground" />
+                <span className="font-semibold">Spy Console</span>
+            </div>
+
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-semibold text-center">Sign In</CardTitle>
-                    <CardDescription className="text-center">
-                        Enter your credentials to access your account
-                    </CardDescription>
+                    <CardTitle className="text-2xl font-semibold">Sign in</CardTitle>
+                    <CardDescription>Enter your credentials to continue.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form
@@ -83,7 +86,7 @@ export const LoginPage = () => {
                                 id="login"
                                 name="username"
                                 type="text"
-                                placeholder="Enter your login"
+                                placeholder="your login"
                                 autoComplete="username"
                                 autoCapitalize="none"
                                 autoCorrect="off"
@@ -100,7 +103,7 @@ export const LoginPage = () => {
                                 id="password"
                                 name="password"
                                 type="password"
-                                placeholder="Enter your password"
+                                placeholder="your password"
                                 autoComplete="current-password"
                                 disabled={isLoading}
                                 ref={passwordRef}
@@ -112,7 +115,7 @@ export const LoginPage = () => {
                             </div>
                         )}
                         <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? 'Signing in...' : 'Sign In'}
+                            {isLoading ? 'Signing in...' : 'Sign in'}
                         </Button>
                     </form>
                 </CardContent>
