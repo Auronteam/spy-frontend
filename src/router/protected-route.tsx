@@ -1,12 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { ROUTES } from '@/lib/routes';
-import Spinner from '@/components/ui/spinner';
-
-type Role = 'admin' | 'user';
+import type { UserRole } from '@/types/auth';
+import { Spinner } from '@/components/ui/spinner';
 
 interface ProtectedRouteProps {
-    allowedRoles?: Role[];
+    allowedRoles?: UserRole[];
 }
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {

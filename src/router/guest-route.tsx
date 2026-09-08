@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
-import { ROUTES } from '@/lib/routes';
-import Spinner from '@/components/ui/spinner';
+import { getHomeRoute } from '@/lib/routes';
+import { Spinner } from '@/components/ui/spinner';
 
 export const GuestRoute = () => {
     const { user, isLoading } = useAuth();
@@ -15,7 +15,7 @@ export const GuestRoute = () => {
     }
 
     if (user) {
-        return <Navigate to={user.role === 'admin' ? ROUTES.profiles : ROUTES.content} replace />;
+        return <Navigate to={getHomeRoute(user.role)} replace />;
     }
 
     return <Outlet />;

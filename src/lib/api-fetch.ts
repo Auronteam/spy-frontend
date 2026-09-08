@@ -84,7 +84,19 @@ async function apiRequest(
             headers: authHeaders(init?.headers),
             signal,
         });
-    } catch {
+    } catch (err) {
+        // Caller (e.g. TanStack Query cancelling a stale request) aborted this
+        // on purpose — not a network failure. Propagate as-is so the caller
+        // can recognize it as a cancellation, instead of masking it as a
+        // fresh ApiError.
+        if (
+            err instanceof DOMException &&
+            err.name === 'AbortError' &&
+            !timeoutController.signal.aborted
+        ) {
+            throw err;
+        }
+
         const error = new ApiError(
             timeoutController.signal.aborted ? 'Request timed out' : 'Could not reach the server'
         );

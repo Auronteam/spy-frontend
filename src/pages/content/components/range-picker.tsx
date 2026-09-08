@@ -3,12 +3,12 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 
-interface IRangePicker {
+interface RangePickerProps {
     dateRange: DateRange | undefined;
     onSelect: (dateRange: DateRange | undefined) => void;
 }
 
-export const RangePicker = ({ dateRange, onSelect }: IRangePicker) => {
+export const RangePicker = ({ dateRange, onSelect }: RangePickerProps) => {
     return (
         <Popover>
             <PopoverTrigger asChild>

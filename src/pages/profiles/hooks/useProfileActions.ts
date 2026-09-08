@@ -13,6 +13,28 @@ interface UseProfileActionsProps {
     isScannerRunning: (profileId: string) => boolean;
 }
 
+// Tracks which profile ids currently have a pending action of one kind —
+// each of the four actions below (start/stop vision, start/stop scanner)
+// needs its own independent set, since they can be in flight for different
+// profiles at once.
+function usePendingIds() {
+    const [ids, setIds] = useState<Record<string, boolean>>({});
+
+    const start = useCallback((id: string) => {
+        setIds(prev => ({ ...prev, [id]: true }));
+    }, []);
+
+    const stop = useCallback((id: string) => {
+        setIds(prev => {
+            const copy = { ...prev };
+            delete copy[id];
+            return copy;
+        });
+    }, []);
+
+    return { ids, start, stop };
+}
+
 export const useProfileActions = ({
     folderId,
     refreshActiveProfiles,
@@ -20,15 +42,23 @@ export const useProfileActions = ({
     confirmStopped,
     isScannerRunning,
 }: UseProfileActionsProps) => {
-    const [stoppingIds, setStoppingIds] = useState<Record<string, boolean>>({});
-    const [startingIds, setStartingIds] = useState<Record<string, boolean>>({});
-    const [scannerStoppingIds, setScannerStoppingIds] = useState<Record<string, boolean>>({});
-    const [scannerStartingIds, setScannerStartingIds] = useState<Record<string, boolean>>({});
+    const { ids: startingIds, start: markStarting, stop: unmarkStarting } = usePendingIds();
+    const { ids: stoppingIds, start: markStopping, stop: unmarkStopping } = usePendingIds();
+    const {
+        ids: scannerStartingIds,
+        start: markScannerStarting,
+        stop: unmarkScannerStarting,
+    } = usePendingIds();
+    const {
+        ids: scannerStoppingIds,
+        start: markScannerStopping,
+        stop: unmarkScannerStopping,
+    } = usePendingIds();
 
     const handleRunVision = useCallback(
         async (profileId: string) => {
             try {
-                setStartingIds(prev => ({ ...prev, [profileId]: true }));
+                markStarting(profileId);
 
                 await runVisionProfile(profileId, folderId ?? undefined);
 
@@ -36,14 +66,10 @@ export const useProfileActions = ({
             } catch (e) {
                 notifyError(e);
             } finally {
-                setStartingIds(prev => {
-                    const copy = { ...prev };
-                    delete copy[profileId];
-                    return copy;
-                });
+                unmarkStarting(profileId);
             }
         },
-        [folderId, refreshActiveProfiles]
+        [folderId, refreshActiveProfiles, markStarting, unmarkStarting]
     );
 
     const handleRunScanner = useCallback(
@@ -54,35 +80,27 @@ export const useProfileActions = ({
             }
 
             try {
-                setScannerStartingIds(prev => ({ ...prev, [profileId]: true }));
+                markScannerStarting(profileId);
 
                 await runScanner(profileId, folderId);
                 startPolling(profileId);
 
                 // Clear starting state after a short delay; polling will reflect running state
                 setTimeout(() => {
-                    setScannerStartingIds(prev => {
-                        const copy = { ...prev };
-                        delete copy[profileId];
-                        return copy;
-                    });
+                    unmarkScannerStarting(profileId);
                 }, 1500);
             } catch (e) {
                 notifyError(e);
-                setScannerStartingIds(prev => {
-                    const copy = { ...prev };
-                    delete copy[profileId];
-                    return copy;
-                });
+                unmarkScannerStarting(profileId);
             }
         },
-        [folderId, startPolling]
+        [folderId, startPolling, markScannerStarting, unmarkScannerStarting]
     );
 
     const handleStopScanner = useCallback(
         async (profileId: string) => {
             try {
-                setScannerStoppingIds(prev => ({ ...prev, [profileId]: true }));
+                markScannerStopping(profileId);
 
                 await stopScanner(profileId);
 
@@ -103,14 +121,10 @@ export const useProfileActions = ({
                     notifyError(e, errorMessage);
                 }
             } finally {
-                setScannerStoppingIds(prev => {
-                    const copy = { ...prev };
-                    delete copy[profileId];
-                    return copy;
-                });
+                unmarkScannerStopping(profileId);
             }
         },
-        [confirmStopped, refreshActiveProfiles]
+        [confirmStopped, refreshActiveProfiles, markScannerStopping, unmarkScannerStopping]
     );
 
     const handleStopVision = useCallback(
@@ -121,7 +135,7 @@ export const useProfileActions = ({
             }
 
             try {
-                setStoppingIds(prev => ({ ...prev, [profileId]: true }));
+                markStopping(profileId);
 
                 if (isScannerRunning(profileId)) {
                     await stopScanner(profileId);
@@ -134,14 +148,17 @@ export const useProfileActions = ({
             } catch (e) {
                 notifyError(e);
             } finally {
-                setStoppingIds(prev => {
-                    const copy = { ...prev };
-                    delete copy[profileId];
-                    return copy;
-                });
+                unmarkStopping(profileId);
             }
         },
-        [folderId, refreshActiveProfiles, isScannerRunning, confirmStopped]
+        [
+            folderId,
+            refreshActiveProfiles,
+            isScannerRunning,
+            confirmStopped,
+            markStopping,
+            unmarkStopping,
+        ]
     );
 
     return {

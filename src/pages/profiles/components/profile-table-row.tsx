@@ -1,4 +1,5 @@
 import { TableCell, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { VisionButtons } from './vision-buttons';
 import { ScannerButtons } from './scanner-buttons';
 
@@ -45,18 +46,18 @@ export const ProfileTableRow = ({
             <TableCell className="font-medium">{profile.name ?? profile.id}</TableCell>
             <TableCell>
                 {paused ? (
-                    <span className="text-amber-700 font-semibold">On Pause</span>
+                    <Badge variant="warning">On Pause</Badge>
                 ) : active ? (
-                    <span className="text-green-700 font-semibold">Active</span>
+                    <Badge variant="success">Active</Badge>
                 ) : (
-                    <span className="text-gray-600">Idle</span>
+                    <Badge variant="secondary">Idle</Badge>
                 )}
             </TableCell>
             <TableCell className="text-center">
                 {scanner ? (
-                    <span className="text-green-600 font-semibold">Running</span>
+                    <Badge variant="success">Running</Badge>
                 ) : (
-                    <span className="text-gray-600">Idle</span>
+                    <Badge variant="secondary">Idle</Badge>
                 )}
             </TableCell>
             <TableCell className="text-right">
