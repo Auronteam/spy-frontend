@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
-import { ROUTES } from '@/lib/routes';
+import { NAV_ITEMS } from '@/router/nav-items';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -8,20 +8,9 @@ export const TopNav = () => {
     const { pathname } = useLocation();
     const { user, logout, isLoading } = useAuth();
 
-    const allSections = [
-        { href: ROUTES.profiles, label: 'Profiles' },
-        { href: ROUTES.content, label: 'Content' },
-        { href: ROUTES.logs, label: 'Logs' },
-        { href: ROUTES.categories, label: 'Categories' },
-        { href: ROUTES.settings, label: 'Settings' },
-    ];
-
-    const sections =
-        user?.role === 'admin'
-            ? allSections
-            : user?.role === 'user'
-              ? [{ href: ROUTES.content, label: 'Content' }]
-              : [];
+    const sections = NAV_ITEMS.filter(
+        item => !item.allowedRoles || (user && item.allowedRoles.includes(user.role))
+    );
 
     return (
         <header className="border-b bg-background">
@@ -43,11 +32,11 @@ export const TopNav = () => {
 
             <nav className="flex gap-6 px-6">
                 {sections.map(s => {
-                    const isActive = pathname === s.href;
+                    const isActive = pathname === s.path;
                     return (
                         <Link
-                            key={s.href}
-                            to={s.href}
+                            key={s.path}
+                            to={s.path}
                             className={cn(
                                 'border-b-2 pb-2 text-sm font-medium transition-colors',
                                 isActive

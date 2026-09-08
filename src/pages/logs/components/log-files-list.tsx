@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
-import Spinner from '@/components/ui/spinner';
+import { Spinner } from '@/components/ui/spinner';
 import { formatDateTime, formatFileSize } from '@/lib/utils';
 import type { LogFile } from '@/pages/logs/types';
 
@@ -40,7 +40,7 @@ export const LogFilesList = ({
                         <Spinner />
                     </div>
                 ) : files.length === 0 ? (
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-sm text-muted-foreground">
                         This profile hasn't run in the last 3 days
                     </p>
                 ) : (
@@ -50,15 +50,15 @@ export const LogFilesList = ({
                                 key={file.name}
                                 type="button"
                                 aria-pressed={selectedFile === file.name}
-                                className={`w-full text-left p-3 rounded-lg transition-colors ${
+                                className={`w-full rounded-lg border p-3 text-left transition-colors ${
                                     selectedFile === file.name
-                                        ? 'bg-blue-50 border border-blue-200'
-                                        : 'bg-gray-50 hover:bg-gray-100'
+                                        ? 'border-foreground bg-muted'
+                                        : 'border-transparent hover:bg-muted'
                                 }`}
                                 onClick={() => onSelectFile(file.name)}
                             >
-                                <div className="font-medium text-sm">{file.name}</div>
-                                <div className="text-xs text-gray-500 mt-1">
+                                <div className="text-sm font-medium">{file.name}</div>
+                                <div className="mt-1 text-xs text-muted-foreground">
                                     <div>{formatFileSize(file.size)}</div>
                                     <div>{formatDateTime(file.modified)}</div>
                                 </div>

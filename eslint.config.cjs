@@ -10,6 +10,7 @@ module.exports = [
         },
         plugins: {
             '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
+            'react-hooks': require('eslint-plugin-react-hooks'),
         },
         rules: {
             'max-len': [
@@ -23,10 +24,12 @@ module.exports = [
                     ignoreTemplateLiterals: true,
                 },
             ],
-            '@typescript-eslint/no-unused-vars': 'warn',
-            '@typescript-eslint/no-explicit-any': 'warn',
+            '@typescript-eslint/no-unused-vars': 'error',
+            '@typescript-eslint/no-explicit-any': 'error',
             'no-console': 'off',
             'no-undef': 'off',
+            'react-hooks/rules-of-hooks': 'error',
+            'react-hooks/exhaustive-deps': 'warn',
         },
     },
 ];

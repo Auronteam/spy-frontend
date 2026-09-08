@@ -1,15 +1,14 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
+import { NAV_ITEMS } from '@/router/nav-items';
 import { ProtectedRoute } from '@/router/protected-route';
 import { GuestRoute } from '@/router/guest-route';
 import { DashboardLayout } from '@/router/dashboard-layout';
 import { RootRedirect } from '@/router/root-redirect';
 import { LoginPage } from '@/pages/login/login-page';
-import { ContentPage } from '@/pages/content/content-page';
-import { ProfilesPage } from '@/pages/profiles/profiles-page';
-import { LogsPage } from '@/pages/logs/logs-page';
-import { CategoriesPage } from '@/pages/categories/categories-page';
-import { SettingsPage } from '@/pages/settings/settings-page';
+
+const publicItems = NAV_ITEMS.filter(item => !item.allowedRoles);
+const adminItems = NAV_ITEMS.filter(item => item.allowedRoles?.includes('admin'));
 
 export const router = createBrowserRouter([
     {
@@ -23,15 +22,16 @@ export const router = createBrowserRouter([
                 element: <DashboardLayout />,
                 children: [
                     { index: true, element: <RootRedirect /> },
-                    { path: ROUTES.content, element: <ContentPage /> },
+                    ...publicItems.map(({ path, element: Element }) => ({
+                        path,
+                        element: <Element />,
+                    })),
                     {
                         element: <ProtectedRoute allowedRoles={['admin']} />,
-                        children: [
-                            { path: ROUTES.profiles, element: <ProfilesPage /> },
-                            { path: ROUTES.logs, element: <LogsPage /> },
-                            { path: ROUTES.categories, element: <CategoriesPage /> },
-                            { path: ROUTES.settings, element: <SettingsPage /> },
-                        ],
+                        children: adminItems.map(({ path, element: Element }) => ({
+                            path,
+                            element: <Element />,
+                        })),
                     },
                 ],
             },

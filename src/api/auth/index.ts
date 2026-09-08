@@ -1,9 +1,10 @@
 import { apiFetch } from '@/lib/api-fetch';
 import { isApiError } from '@/lib/errors/api-error';
+import type { UserRole } from '@/types/auth';
 
 export type AuthUser = {
     login: string;
-    role: 'admin' | 'user';
+    role: UserRole;
 };
 
 export interface LoginPayload {

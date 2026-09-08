@@ -1,8 +1,9 @@
 import type { RefObject } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Download } from 'lucide-react';
-import Spinner from '@/components/ui/spinner';
+import { Spinner } from '@/components/ui/spinner';
 
 interface LogContentViewerProps {
     selectedFile: string;
@@ -71,8 +72,10 @@ export const LogContentViewer = ({
                         onScroll={onScroll}
                         className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-auto max-h-96"
                     >
-                        <div role="status" aria-live="polite" className="mb-2 text-xs text-gray-400">
-                            {isConnected ? '🟢 Live stream active' : '🔴 Connecting...'}
+                        <div role="status" aria-live="polite" className="mb-2">
+                            <Badge variant={isConnected ? 'success' : 'info'}>
+                                {isConnected ? 'Live stream active' : 'Connecting...'}
+                            </Badge>
                         </div>
                         <div className="flex flex-col gap-0.5">
                             {(liveLogContent
@@ -103,7 +106,7 @@ export const LogContentViewer = ({
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-muted-foreground">
                         {isLiveMode
                             ? 'Live log streaming mode'
                             : 'Select a log file to view its content'}

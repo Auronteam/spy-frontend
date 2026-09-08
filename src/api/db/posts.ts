@@ -30,7 +30,7 @@ export async function fetchPosts(
     }
 
     const dto = await apiFetch<PagedResponse<PostDto>>(`/api/posts?${params.toString()}`, {
-        cache: 'force-cache',
+        cache: 'no-store',
     });
 
     return { ...dto, items: dto.items.map(mapPostDtoToPost) };

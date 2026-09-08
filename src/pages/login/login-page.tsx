@@ -1,9 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import { login } from '@/api/auth';
 import { useAuth } from '@/contexts/auth-context';
-import { ROUTES } from '@/lib/routes';
+import { getHomeRoute } from '@/lib/routes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,24 +16,29 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const LoginPage = () => {
+    const [values, setValues] = useState<LoginFormValues>({ login: '', password: '' });
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const { login: setSession } = useAuth();
 
-    const loginRef = useRef<HTMLInputElement>(null);
-    const passwordRef = useRef<HTMLInputElement>(null);
-
-    const onSubmit = async (values: LoginFormValues) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         setError(null);
-        setIsLoading(true);
 
+        const parse = loginSchema.safeParse(values);
+        if (!parse.success) {
+            setError(parse.error.issues[0]?.message || 'Invalid data');
+            return;
+        }
+
+        setIsLoading(true);
         try {
-            const response = await login({ login: values.login, password: values.password });
+            const response = await login(parse.data);
 
             if (response.success && response.token && response.user) {
                 setSession(response.token, response.user);
-                navigate(response.user.role === 'admin' ? ROUTES.profiles : ROUTES.content);
+                navigate(getHomeRoute(response.user.role));
             } else {
                 setError(response.error || 'Login failed');
             }
@@ -57,27 +62,7 @@ export const LoginPage = () => {
                     <CardDescription>Enter your credentials to continue.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form
-                        method="post"
-                        autoComplete="on"
-                        className="space-y-4"
-                        onSubmit={async e => {
-                            e.preventDefault();
-                            const formData = new FormData(e.currentTarget);
-                            const raw = {
-                                login: String(
-                                    formData.get('login') || formData.get('username') || ''
-                                ).trim(),
-                                password: String(formData.get('password') || ''),
-                            };
-                            const parse = loginSchema.safeParse(raw);
-                            if (!parse.success) {
-                                setError(parse.error.issues[0]?.message || 'Invalid data');
-                                return;
-                            }
-                            await onSubmit(parse.data);
-                        }}
-                    >
+                    <form autoComplete="on" className="space-y-4" onSubmit={handleSubmit}>
                         <div className="space-y-2">
                             <label className="text-sm font-medium" htmlFor="login">
                                 Login
@@ -92,7 +77,10 @@ export const LoginPage = () => {
                                 autoCorrect="off"
                                 inputMode="text"
                                 disabled={isLoading}
-                                ref={loginRef}
+                                value={values.login}
+                                onChange={e =>
+                                    setValues(prev => ({ ...prev, login: e.target.value }))
+                                }
                             />
                         </div>
                         <div className="space-y-2">
@@ -106,7 +94,10 @@ export const LoginPage = () => {
                                 placeholder="your password"
                                 autoComplete="current-password"
                                 disabled={isLoading}
-                                ref={passwordRef}
+                                value={values.password}
+                                onChange={e =>
+                                    setValues(prev => ({ ...prev, password: e.target.value }))
+                                }
                             />
                         </div>
                         {error && (
