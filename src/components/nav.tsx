@@ -14,7 +14,7 @@ export const TopNav = () => {
 
     return (
         <header className="border-b bg-background">
-            <div className="flex items-center justify-between px-6 py-3">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
                 <div className="flex items-center gap-2">
                     <div className="h-6 w-6 rounded-sm bg-foreground" />
                     <span className="font-semibold">Spy Console</span>
@@ -30,7 +30,7 @@ export const TopNav = () => {
                 )}
             </div>
 
-            <nav className="flex gap-6 px-6">
+            <nav className="mx-auto flex max-w-7xl gap-6 px-6">
                 {sections.map(s => {
                     const isActive = pathname === s.path;
                     return (

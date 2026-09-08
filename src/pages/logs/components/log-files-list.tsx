@@ -1,7 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
-import { Spinner } from '@/components/ui/spinner';
 import { formatDateTime, formatFileSize } from '@/lib/utils';
 import type { LogFile } from '@/pages/logs/types';
 
@@ -21,52 +20,41 @@ export const LogFilesList = ({
     onRefetch,
 }: LogFilesListProps) => {
     return (
-        <Card className="lg:col-span-1">
-            <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                    Log Files
-                    <Button variant="ghost" size="sm" onClick={onRefetch} disabled={filesLoading}>
-                        {filesLoading ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <RefreshCw className="h-4 w-4" />
-                        )}
-                    </Button>
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                {filesLoading ? (
-                    <div className="py-4">
-                        <Spinner />
-                    </div>
-                ) : files.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                        This profile hasn't run in the last 3 days
-                    </p>
-                ) : (
-                    <div className="space-y-2">
-                        {files.map(file => (
-                            <button
-                                key={file.name}
-                                type="button"
-                                aria-pressed={selectedFile === file.name}
-                                className={`w-full rounded-lg border p-3 text-left transition-colors ${
-                                    selectedFile === file.name
-                                        ? 'border-foreground bg-muted'
-                                        : 'border-transparent hover:bg-muted'
-                                }`}
-                                onClick={() => onSelectFile(file.name)}
-                            >
-                                <div className="text-sm font-medium">{file.name}</div>
-                                <div className="mt-1 text-xs text-muted-foreground">
-                                    <div>{formatFileSize(file.size)}</div>
-                                    <div>{formatDateTime(file.modified)}</div>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </CardContent>
+        <Card className="overflow-hidden p-0">
+            <div className="flex items-center justify-between border-b px-3 py-2.5 text-xs font-medium text-muted-foreground">
+                Log files · {files.length}
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={onRefetch}
+                    disabled={filesLoading}
+                >
+                    {filesLoading ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                        <RefreshCw className="h-3.5 w-3.5" />
+                    )}
+                </Button>
+            </div>
+            <div className="flex flex-col gap-0.5 p-1.5">
+                {files.map(file => (
+                    <button
+                        key={file.name}
+                        type="button"
+                        aria-pressed={selectedFile === file.name}
+                        className={`flex flex-col gap-0.5 rounded-md px-2.5 py-2 text-left transition-colors ${
+                            selectedFile === file.name ? 'bg-muted' : 'hover:bg-muted/60'
+                        }`}
+                        onClick={() => onSelectFile(file.name)}
+                    >
+                        <span className="font-mono text-xs font-medium">{file.name}</span>
+                        <span className="text-[11px] text-muted-foreground">
+                            {formatFileSize(file.size)} · {formatDateTime(file.modified)}
+                        </span>
+                    </button>
+                ))}
+            </div>
         </Card>
     );
 };

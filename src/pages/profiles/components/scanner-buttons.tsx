@@ -48,20 +48,20 @@ export const ScannerButtons = ({
         const disabled = !visionActive || visionStarting || visionStopping || !visionReady;
         return (
             <Button
-                variant="default"
+                variant="outline"
                 size="sm"
                 disabled={disabled}
                 onClick={() => onRunScanner(profileId)}
             >
-                Start Scanner
+                Start scanner
             </Button>
         );
     }
 
     // Scanner is running
     return (
-        <Button variant="destructive" size="sm" onClick={() => onStopScanner(profileId)}>
-            Stop Scanner
+        <Button variant="outline" size="sm" onClick={() => onStopScanner(profileId)}>
+            Stop scanner
         </Button>
     );
 };

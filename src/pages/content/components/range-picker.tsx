@@ -8,12 +8,21 @@ interface RangePickerProps {
     onSelect: (dateRange: DateRange | undefined) => void;
 }
 
+const formatDate = (date: Date): string =>
+    date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+const getRangeLabel = (dateRange: DateRange | undefined): string => {
+    if (!dateRange?.from) return 'Select date range';
+    if (!dateRange.to) return formatDate(dateRange.from);
+    return `${formatDate(dateRange.from)} – ${formatDate(dateRange.to)}`;
+};
+
 export const RangePicker = ({ dateRange, onSelect }: RangePickerProps) => {
     return (
         <Popover>
             <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    {dateRange ? 'Date filters selected' : 'Select date'}
+                    {getRangeLabel(dateRange)}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-2">

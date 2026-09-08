@@ -18,5 +18,6 @@ export const useVisionProfiles = (folderId: string | null) => {
         profiles: query.data ?? EMPTY_PROFILES,
         loading: query.isLoading,
         error: query.error,
+        refetch: query.refetch,
     };
 };
