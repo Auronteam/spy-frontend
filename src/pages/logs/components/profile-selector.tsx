@@ -22,7 +22,7 @@ export const ProfileSelector = ({
     onProfileChange,
 }: ProfileSelectorProps) => {
     return (
-        <div className="mb-6 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
             {folders.length > 1 && (
                 <Select value={folderId ?? ''} onValueChange={onFolderChange} className="max-w-xs">
                     {folders.map(folder => (

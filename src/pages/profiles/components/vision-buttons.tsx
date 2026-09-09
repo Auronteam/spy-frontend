@@ -52,7 +52,7 @@ export const VisionButtons = ({
         }
         return (
             <Button variant="default" size="sm" onClick={() => onRunVision(profileId)}>
-                Vision Connect
+                Connect
             </Button>
         );
     }
@@ -66,8 +66,8 @@ export const VisionButtons = ({
     }
 
     return (
-        <Button variant="destructive" size="sm" onClick={() => onStopVision(profileId)}>
-            Stop Vision
+        <Button variant="outline" size="sm" onClick={() => onStopVision(profileId)}>
+            Disconnect
         </Button>
     );
 };

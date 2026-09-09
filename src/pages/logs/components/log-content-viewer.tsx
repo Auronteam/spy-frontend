@@ -1,28 +1,65 @@
 import type { RefObject } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Download } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
+
+const TIMESTAMP_PATTERN = /^\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2})\]\s?(.*)$/;
+
+function splitLogLine(line: string): { time: string; message: string } {
+    const match = line.match(TIMESTAMP_PATTERN);
+    return match ? { time: match[1], message: match[2] } : { time: '', message: line };
+}
+
+function LogLines({ content, placeholder }: { content: string; placeholder: string }) {
+    const lines = content.split('\n').filter(line => line.length > 0);
+
+    if (lines.length === 0) {
+        return (
+            <div className="px-3.5 py-8 text-center text-sm text-muted-foreground">
+                {placeholder}
+            </div>
+        );
+    }
+
+    return (
+        <>
+            {lines.map((line, idx) => {
+                const { time, message } = splitLogLine(line);
+                return (
+                    <div
+                        key={idx}
+                        className="grid grid-cols-[80px_1fr] items-start gap-3 border-b px-3.5 py-2 text-xs last:border-0"
+                    >
+                        <span className="font-mono text-muted-foreground">{time}</span>
+                        <span className="whitespace-pre-wrap break-words font-mono text-foreground/90">
+                            {message}
+                        </span>
+                    </div>
+                );
+            })}
+        </>
+    );
+}
 
 interface LogContentViewerProps {
     selectedFile: string;
     isLiveMode: boolean;
     isConnected: boolean;
+    isScannerRunning: boolean;
     liveLogContent: string;
     logContent: string;
     contentLoading: boolean;
-    liveLogRef: RefObject<HTMLDivElement>;
-    staticLogRef: RefObject<HTMLDivElement>;
+    liveLogRef: RefObject<HTMLDivElement | null>;
+    staticLogRef: RefObject<HTMLDivElement | null>;
     onScroll: () => void;
     onToggleLiveMode: () => void;
-    onDownload: () => void;
 }
 
 export const LogContentViewer = ({
     selectedFile,
     isLiveMode,
     isConnected,
+    isScannerRunning,
     liveLogContent,
     logContent,
     contentLoading,
@@ -30,38 +67,38 @@ export const LogContentViewer = ({
     staticLogRef,
     onScroll,
     onToggleLiveMode,
-    onDownload,
 }: LogContentViewerProps) => {
     return (
-        <Card className="lg:col-span-3">
-            <CardHeader>
-                <div className="flex items-center justify-between">
-                    <CardTitle>
-                        {selectedFile ? `Log Content: ${selectedFile}` : 'Select a log file'}
-                    </CardTitle>
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant={isLiveMode ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={onToggleLiveMode}
+        <Card className="overflow-hidden p-0">
+            <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 border-b px-3.5 py-2.5">
+                <span className="truncate font-mono text-xs font-medium">
+                    {isLiveMode ? 'live-stream' : selectedFile || '—'}
+                </span>
+                <div className="flex items-center gap-3">
+                    {isLiveMode && (
+                        <span
+                            className={`flex items-center gap-1.5 text-xs font-medium ${isConnected ? 'text-green-700' : 'text-muted-foreground'}`}
                         >
-                            {isLiveMode ? 'Stop stream' : 'Start stream'}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onDownload}
-                            disabled={
-                                !selectedFile || (!logContent && !liveLogContent) || contentLoading
-                            }
-                        >
-                            <Download className="h-4 w-4 mr-2" />
-                            Download
-                        </Button>
-                    </div>
+                            <span
+                                className={`h-1.5 w-1.5 rounded-full ${isConnected ? 'bg-green-600' : 'bg-zinc-400'}`}
+                            />
+                            {isConnected ? 'Live' : 'Connecting...'}
+                        </span>
+                    )}
+                    {!isScannerRunning && !isLiveMode && (
+                        <span className="text-xs text-muted-foreground">Scanner is off</span>
+                    )}
+                    <Button
+                        variant={isLiveMode ? 'outline' : 'default'}
+                        size="sm"
+                        onClick={onToggleLiveMode}
+                        disabled={!isLiveMode && !isScannerRunning}
+                    >
+                        {isLiveMode ? 'Stop live stream' : 'Start live stream'}
+                    </Button>
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
                 {contentLoading ? (
                     <div className="py-8">
                         <Spinner />
@@ -70,49 +107,22 @@ export const LogContentViewer = ({
                     <div
                         ref={liveLogRef}
                         onScroll={onScroll}
-                        className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-auto max-h-96"
+                        className="max-h-[460px] overflow-auto"
                     >
-                        <div role="status" aria-live="polite" className="mb-2">
-                            <Badge variant={isConnected ? 'success' : 'info'}>
-                                {isConnected ? 'Live stream active' : 'Connecting...'}
-                            </Badge>
-                        </div>
-                        <div className="flex flex-col gap-0.5">
-                            {(liveLogContent
-                                ? liveLogContent.split('\n')
-                                : ['Waiting for live logs...']
-                            )
-                                .filter(line => line.length > 0)
-                                .map((line, idx) => (
-                                    <div key={idx} className="whitespace-pre-wrap">
-                                        {line}
-                                    </div>
-                                ))}
-                        </div>
-                    </div>
-                ) : selectedFile ? (
-                    <div
-                        ref={staticLogRef}
-                        className="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-auto max-h-96"
-                    >
-                        <div className="flex flex-col gap-0.5">
-                            {(logContent ? logContent.split('\n') : ['No content to display'])
-                                .filter(line => line.length > 0)
-                                .map((line, idx) => (
-                                    <div key={idx} className="whitespace-pre-wrap">
-                                        {line}
-                                    </div>
-                                ))}
-                        </div>
+                        <LogLines content={liveLogContent} placeholder="Waiting for live logs..." />
                     </div>
                 ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                        {isLiveMode
-                            ? 'Live log streaming mode'
-                            : 'Select a log file to view its content'}
+                    <div ref={staticLogRef} className="max-h-[460px] overflow-auto">
+                        <LogLines content={logContent} placeholder="No content to display" />
                     </div>
                 )}
             </CardContent>
+            {isLiveMode && isConnected && (
+                <div className="flex items-center gap-2 border-t bg-muted/50 px-3.5 py-2.5 text-xs font-medium text-green-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                    Streaming live
+                </div>
+            )}
         </Card>
     );
 };

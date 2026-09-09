@@ -5,6 +5,10 @@ const config: Config = {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
     theme: {
         extend: {
+            fontFamily: {
+                sans: ['Geist', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+            },
             borderRadius: {
                 lg: 'var(--radius)',
                 md: 'calc(var(--radius) - 2px)',

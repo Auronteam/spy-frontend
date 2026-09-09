@@ -43,24 +43,33 @@ export const ProfileTableRow = ({
 }: ProfileTableRowProps) => {
     return (
         <TableRow key={profile.id}>
-            <TableCell className="font-medium">{profile.name ?? profile.id}</TableCell>
-            <TableCell>
+            <TableCell className="px-4 font-medium">{profile.name ?? profile.id}</TableCell>
+            <TableCell className="px-4">
                 {paused ? (
                     <Badge variant="warning">On Pause</Badge>
                 ) : active ? (
-                    <Badge variant="success">Active</Badge>
+                    <Badge variant="success">
+                        <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                        Connected
+                    </Badge>
                 ) : (
-                    <Badge variant="secondary">Idle</Badge>
+                    <Badge variant="secondary">
+                        <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                        Disconnected
+                    </Badge>
                 )}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="px-4">
                 {scanner ? (
-                    <Badge variant="success">Running</Badge>
+                    <Badge variant="info">
+                        <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                        Running
+                    </Badge>
                 ) : (
-                    <Badge variant="secondary">Idle</Badge>
+                    <Badge variant="secondary">Stopped</Badge>
                 )}
             </TableCell>
-            <TableCell className="text-right">
+            <TableCell className="px-4 text-right">
                 <div className="flex items-center justify-end gap-2">
                     <VisionButtons
                         profileId={profile.id}
