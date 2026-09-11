@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatIsoToDMY } from '@/lib/utils';
 import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
-import { getDriveFileSrc, getFlagEmoji } from '../utils';
+import { getDriveFileSrc, getDriveFolderUrl, getFlagEmoji } from '../utils';
 import type { Post } from '../types';
 import { CreativeMediaPreview } from './creative-media-preview';
 
@@ -106,7 +106,7 @@ export const CreativeDialog = ({ open, onOpenChange, post }: CreativeDialogProps
                                 {post.googleDriveFolderId && (
                                     <CreativeLinkRow
                                         label="Archive link to Google Drive"
-                                        url={`https://drive.google.com/drive/folders/${post.googleDriveFolderId}`}
+                                        url={getDriveFolderUrl(post.googleDriveFolderId)}
                                         copyKey="archive"
                                         copiedKey={copiedKey}
                                         onCopy={copyToClipboard}
