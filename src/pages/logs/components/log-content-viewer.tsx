@@ -10,6 +10,17 @@ function splitLogLine(line: string): { time: string; message: string } {
     return match ? { time: match[1], message: match[2] } : { time: '', message: line };
 }
 
+function LiveStatusDot({ live, label }: { live: boolean; label: string }) {
+    return (
+        <span
+            className={`flex items-center gap-1.5 text-xs font-medium ${live ? 'text-green-700' : 'text-muted-foreground'}`}
+        >
+            <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-green-600' : 'bg-zinc-400'}`} />
+            {label}
+        </span>
+    );
+}
+
 function LogLines({ content, placeholder }: { content: string; placeholder: string }) {
     const lines = content.split('\n').filter(line => line.length > 0);
 
@@ -76,14 +87,10 @@ export const LogContentViewer = ({
                 </span>
                 <div className="flex items-center gap-3">
                     {isLiveMode && (
-                        <span
-                            className={`flex items-center gap-1.5 text-xs font-medium ${isConnected ? 'text-green-700' : 'text-muted-foreground'}`}
-                        >
-                            <span
-                                className={`h-1.5 w-1.5 rounded-full ${isConnected ? 'bg-green-600' : 'bg-zinc-400'}`}
-                            />
-                            {isConnected ? 'Live' : 'Connecting...'}
-                        </span>
+                        <LiveStatusDot
+                            live={isConnected}
+                            label={isConnected ? 'Live' : 'Connecting...'}
+                        />
                     )}
                     {!isScannerRunning && !isLiveMode && (
                         <span className="text-xs text-muted-foreground">Scanner is off</span>
@@ -118,9 +125,8 @@ export const LogContentViewer = ({
                 )}
             </CardContent>
             {isLiveMode && isConnected && (
-                <div className="flex items-center gap-2 border-t bg-muted/50 px-3.5 py-2.5 text-xs font-medium text-green-700">
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
-                    Streaming live
+                <div className="flex items-center gap-2 border-t bg-muted/50 px-3.5 py-2.5">
+                    <LiveStatusDot live label="Streaming live" />
                 </div>
             )}
         </Card>

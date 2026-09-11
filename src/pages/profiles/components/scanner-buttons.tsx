@@ -1,32 +1,20 @@
 import { Button } from '@/components/ui/button';
+import type { ScannerState, VisionState } from '../types';
 
 interface ScannerButtonsProps {
-    profileId: string;
-    scanner: boolean;
-    visionActive: boolean;
-    scannerStopping?: boolean;
-    scannerStarting?: boolean;
-    visionStarting?: boolean;
-    visionStopping?: boolean;
-    visionReady?: boolean;
-    onRunScanner: (profileId: string) => void;
-    onStopScanner: (profileId: string) => void;
+    vision: VisionState;
+    scanner: ScannerState;
+    onRunScanner: () => void;
+    onStopScanner: () => void;
 }
 
 export const ScannerButtons = ({
-    profileId,
+    vision,
     scanner,
-    visionActive,
-    scannerStopping = false,
-    scannerStarting = false,
-    visionStarting = false,
-    visionStopping = false,
-    visionReady = false,
     onRunScanner,
     onStopScanner,
 }: ScannerButtonsProps) => {
-    // Show stopping state
-    if (scannerStopping) {
+    if (scanner.stopping) {
         return (
             <Button variant="secondary" size="sm" disabled>
                 Stopping...
@@ -34,8 +22,7 @@ export const ScannerButtons = ({
         );
     }
 
-    // Show starting state
-    if (scannerStarting) {
+    if (scanner.starting) {
         return (
             <Button variant="secondary" size="sm" disabled>
                 Starting...
@@ -44,15 +31,10 @@ export const ScannerButtons = ({
     }
 
     // If scanner is not running, show Start button (enabled only when Vision is active, ready and not transitioning)
-    if (!scanner) {
-        const disabled = !visionActive || visionStarting || visionStopping || !visionReady;
+    if (!scanner.running) {
+        const disabled = !vision.active || vision.starting || vision.stopping || !vision.ready;
         return (
-            <Button
-                variant="outline"
-                size="sm"
-                disabled={disabled}
-                onClick={() => onRunScanner(profileId)}
-            >
+            <Button variant="outline" size="sm" disabled={disabled} onClick={onRunScanner}>
                 Start scanner
             </Button>
         );
@@ -60,7 +42,7 @@ export const ScannerButtons = ({
 
     // Scanner is running
     return (
-        <Button variant="outline" size="sm" onClick={() => onStopScanner(profileId)}>
+        <Button variant="outline" size="sm" onClick={onStopScanner}>
             Stop scanner
         </Button>
     );

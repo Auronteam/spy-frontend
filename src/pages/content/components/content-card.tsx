@@ -4,14 +4,26 @@ import type { Post } from '../types';
 
 interface ContentCardProps {
     post: Post;
+    onClick: (post: Post) => void;
 }
 
-export const ContentCard = ({ post }: ContentCardProps) => (
-    <div className="flex flex-col overflow-hidden rounded-lg border bg-card transition-colors hover:border-zinc-300 hover:shadow-sm">
+export const ContentCard = ({ post, onClick }: ContentCardProps) => (
+    <div
+        role="button"
+        tabIndex={0}
+        onClick={() => onClick(post)}
+        onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick(post);
+            }
+        }}
+        className="flex cursor-pointer flex-col overflow-hidden rounded-lg border bg-card transition-colors hover:border-zinc-300 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+    >
         <div className="aspect-[4/3] bg-muted">
             <img
                 src={getDriveFileSrc(post.creativeImageUrl)}
-                alt=""
+                alt={`${post.category.title} creative — ${post.geo}`}
                 className="h-full w-full object-cover"
             />
         </div>

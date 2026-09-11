@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BACKEND_BASE } from '@/config';
-import { useVisionFolders } from '@/pages/profiles/hooks/useVisionFolders';
-import { useVisionProfiles } from '@/pages/profiles/hooks/useVisionProfiles';
+import { useVisionFolders } from '@/hooks/useVisionFolders';
+import { useVisionProfiles } from '@/hooks/useVisionProfiles';
 import { useLogStream } from './hooks/use-log-stream';
 import { useProfileLogFiles } from './hooks/use-profile-log-files';
 import { useLogAutoScroll } from './hooks/use-log-auto-scroll';
