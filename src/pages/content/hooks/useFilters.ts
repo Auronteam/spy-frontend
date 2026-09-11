@@ -8,17 +8,20 @@ export type Filters = {
     createdAt?: DateRange;
 };
 
-// Date-only, UTC — avoids the local-timezone shift a plain toISOString()
-// would introduce for dates near midnight (same reasoning as
-// lib/utils.ts's formatIsoToDMY).
+// Calendar hands us Date objects in local time (a click on "Sep 1" is local
+// midnight Sep 1) — read/construct them in local time too, no UTC anywhere.
+// Going through getUTC*()/a Z-suffixed ISO string here shifted the stored
+// day backward by one for any positive UTC offset (local midnight Sep 1 is
+// still Aug 31 in UTC).
 function formatDateParam(date: Date): string {
     const pad = (n: number) => String(n).padStart(2, '0');
-    return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
 function parseDateParam(value: string | null): Date | undefined {
     if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
-    const date = new Date(`${value}T00:00:00Z`);
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
