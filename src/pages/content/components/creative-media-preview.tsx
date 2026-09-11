@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui/badge';
+
 interface CreativeMediaPreviewProps {
     videoKey: string;
     hasVideo: boolean;
@@ -12,7 +14,7 @@ export const CreativeMediaPreview = ({
     posterSrc,
 }: CreativeMediaPreviewProps) => {
     return (
-        <div className="relative w-full md:h-full">
+        <div className="relative w-full overflow-hidden rounded-lg bg-muted md:h-full">
             {hasVideo ? (
                 <video
                     key={videoKey}
@@ -21,10 +23,19 @@ export const CreativeMediaPreview = ({
                     controls
                     playsInline
                     preload="metadata"
-                    className="block w-full h-full object-contain"
+                    className="block h-full w-full object-contain"
                 />
             ) : (
-                <img src={posterSrc} alt="Preview" className="block w-full h-full object-contain" />
+                <img
+                    src={posterSrc}
+                    alt="Creative preview"
+                    className="block h-full w-full object-contain"
+                />
+            )}
+            {hasVideo && (
+                <Badge variant="secondary" className="absolute left-2 top-2">
+                    VIDEO
+                </Badge>
             )}
         </div>
     );

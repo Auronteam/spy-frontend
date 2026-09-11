@@ -14,6 +14,15 @@ the `spy` monorepo's backend on Hetzner over plain `fetch`.
 
 ---
 
+# Language
+
+English only, everywhere in this repository — code, identifiers, comments,
+commit messages, and any committed docs/markdown (`docs/*.md` included). No
+Russian, even in something that starts as a scratch note if it ends up
+committed. This is about what lands in the repo, not the chat with the user.
+
+---
+
 # Architecture
 
 Same layering as `AI_GUIDELINES.md` (components render, hooks manage
@@ -24,7 +33,9 @@ state/effects, services/api do data logic), applied here as:
   business logic itself.
 - **Feature hooks** (`src/pages/<feature>/hooks/`) — state, effects, and
   TanStack Query usage for that feature. Call into `src/api/*`, never `fetch`
-  directly.
+  directly. Promoted to `src/hooks/` only once actually reused across
+  features (e.g. `useVisionFolders`/`useVisionProfiles`, used by both
+  Profiles and Logs).
 - **Feature components** (`src/pages/<feature>/components/`) — presentational
   pieces local to one feature (a table row, a filter bar). Promoted to
   `src/components/` only once actually reused across features.
@@ -54,6 +65,7 @@ src/
 │   ├── nav.tsx                # TopNav
 │   └── stat-card.tsx          # etc. — anything used by 2+ features lands here
 ├── components/errors/         # PageError, QueryPageGuard
+├── hooks/                     # shared, cross-feature hooks — same "2+ features" rule as components/
 ├── contexts/                  # React Context providers (auth-context.tsx)
 ├── router/                    # createBrowserRouter config, ProtectedRoute/GuestRoute, DashboardLayout
 ├── providers/                  # app-level providers mounted once in App.tsx (QueryProvider, SentryInit)

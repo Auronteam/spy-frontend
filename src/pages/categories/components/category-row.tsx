@@ -17,7 +17,7 @@ export const CategoryRow = ({ category, onEdit, onDelete }: CategoryRowProps) =>
             <Button
                 variant="outline"
                 size="sm"
-                className="text-red-700 hover:bg-red-50 hover:text-red-700"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 onClick={onDelete}
                 disabled={category.protected}
                 title={category.protected ? 'Protected categories cannot be deleted' : undefined}

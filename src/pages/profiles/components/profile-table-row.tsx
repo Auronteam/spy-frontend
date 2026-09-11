@@ -1,46 +1,48 @@
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { useVisionActions } from '../hooks/useVisionActions';
+import { useScannerActions } from '../hooks/useScannerActions';
+import type { Profile } from '../types';
 import { VisionButtons } from './vision-buttons';
 import { ScannerButtons } from './scanner-buttons';
 
-interface Profile {
-    id: string;
-    name?: string;
-}
-
 interface ProfileTableRowProps {
     profile: Profile;
+    folderId: string | null;
     active: boolean;
-    scanner: boolean;
-    paused?: boolean;
-    pauseMsLeft?: number;
-    stopping: boolean;
-    starting: boolean;
-    scannerStopping: boolean;
-    scannerStarting?: boolean;
-    visionReady?: boolean;
-    handleRunVision: (profileId: string) => void;
-    handleStopVision: (profileId: string) => void;
-    handleRunScanner: (profileId: string) => void;
-    handleStopScanner: (profileId: string) => void;
+    visionReady: boolean;
+    paused: boolean;
+    pauseMsLeft: number;
+    scannerRunning: boolean;
 }
 
 export const ProfileTableRow = ({
     profile,
+    folderId,
     active,
-    scanner,
-    paused = false,
-    pauseMsLeft = 0,
-    stopping,
-    starting,
-    scannerStopping,
-    scannerStarting = false,
-    visionReady = false,
-    handleRunVision,
-    handleStopVision,
-    handleRunScanner,
-    handleStopScanner,
+    visionReady,
+    paused,
+    pauseMsLeft,
+    scannerRunning,
 }: ProfileTableRowProps) => {
+    const vision = useVisionActions(profile.id, folderId, scannerRunning);
+    const scanner = useScannerActions(profile.id, folderId);
+
+    const visionState = {
+        active,
+        ready: visionReady,
+        starting: vision.isStarting,
+        stopping: vision.isStopping,
+        paused,
+        pauseMsLeft,
+    };
+
+    const scannerState = {
+        running: scannerRunning,
+        starting: scanner.isStarting,
+        stopping: scanner.isStopping,
+    };
+
     return (
         <TableRow key={profile.id}>
             <TableCell className="px-4 font-medium">{profile.name ?? profile.id}</TableCell>
@@ -60,7 +62,7 @@ export const ProfileTableRow = ({
                 )}
             </TableCell>
             <TableCell className="px-4">
-                {scanner ? (
+                {scannerRunning ? (
                     <Badge variant="info">
                         <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
                         Running
@@ -72,26 +74,15 @@ export const ProfileTableRow = ({
             <TableCell className="px-4 text-right">
                 <div className="flex items-center justify-end gap-2">
                     <VisionButtons
-                        profileId={profile.id}
-                        active={active}
-                        starting={starting}
-                        stopping={stopping}
-                        paused={paused}
-                        pauseMsLeft={pauseMsLeft}
-                        onRunVision={handleRunVision}
-                        onStopVision={handleStopVision}
+                        vision={visionState}
+                        onRunVision={vision.runVision}
+                        onStopVision={vision.stopVision}
                     />
                     <ScannerButtons
-                        profileId={profile.id}
-                        scanner={scanner}
-                        visionActive={active}
-                        scannerStopping={scannerStopping}
-                        scannerStarting={scannerStarting}
-                        visionStarting={starting}
-                        visionStopping={stopping}
-                        visionReady={visionReady}
-                        onRunScanner={handleRunScanner}
-                        onStopScanner={handleStopScanner}
+                        vision={visionState}
+                        scanner={scannerState}
+                        onRunScanner={scanner.runScanner}
+                        onStopScanner={scanner.stopScanner}
                     />
                 </div>
             </TableCell>

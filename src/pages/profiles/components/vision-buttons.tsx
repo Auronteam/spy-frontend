@@ -1,27 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { usePauseCountdown } from '@/pages/profiles/hooks/usePauseCountdown';
+import type { VisionState } from '../types';
 
 interface VisionButtonsProps {
-    profileId: string;
-    active: boolean;
-    starting: boolean;
-    stopping: boolean;
-    paused?: boolean;
-    pauseMsLeft?: number;
-    onRunVision: (profileId: string) => void;
-    onStopVision: (profileId: string) => void;
+    vision: VisionState;
+    onRunVision: () => void;
+    onStopVision: () => void;
 }
 
-export const VisionButtons = ({
-    profileId,
-    active,
-    starting,
-    stopping,
-    paused = false,
-    pauseMsLeft = 0,
-    onRunVision,
-    onStopVision,
-}: VisionButtonsProps) => {
+export const VisionButtons = ({ vision, onRunVision, onStopVision }: VisionButtonsProps) => {
+    const { active, starting, stopping, paused, pauseMsLeft } = vision;
     const localMsLeft = usePauseCountdown(pauseMsLeft, paused);
 
     const formatMs = (ms: number) => {
@@ -51,7 +39,7 @@ export const VisionButtons = ({
             );
         }
         return (
-            <Button variant="default" size="sm" onClick={() => onRunVision(profileId)}>
+            <Button variant="default" size="sm" onClick={onRunVision}>
                 Connect
             </Button>
         );
@@ -66,7 +54,7 @@ export const VisionButtons = ({
     }
 
     return (
-        <Button variant="outline" size="sm" onClick={() => onStopVision(profileId)}>
+        <Button variant="outline" size="sm" onClick={onStopVision}>
             Disconnect
         </Button>
     );

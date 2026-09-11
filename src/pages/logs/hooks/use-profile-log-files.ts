@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { skipToken, useQuery } from '@tanstack/react-query';
-import { fetchProfileLogFiles } from '@/api/logs';
-import { apiFetchText } from '@/lib/api-fetch';
+import { fetchProfileLogContent, fetchProfileLogFiles } from '@/api/logs';
 import { notifyError } from '@/lib/errors/notify-error';
 import type { LogFile } from '../types';
 
@@ -53,13 +52,12 @@ export function useProfileLogFiles(
         queryKey: ['logs', 'content', profileId, selectedFile],
         queryFn:
             selectedFile && !isLiveMode
-                ? ({ signal }: { signal: AbortSignal }) => {
-                      const params = new URLSearchParams({
-                          lines: CONTENT_LINES,
-                          tail: String(CONTENT_TAIL),
-                      });
-                      return apiFetchText(`/api/logs/${selectedFile}?${params}`, { signal });
-                  }
+                ? ({ signal }: { signal: AbortSignal }) =>
+                      fetchProfileLogContent(
+                          selectedFile,
+                          { lines: CONTENT_LINES, tail: CONTENT_TAIL },
+                          signal
+                      )
                 : skipToken,
     });
 

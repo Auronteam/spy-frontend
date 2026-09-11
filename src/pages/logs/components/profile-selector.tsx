@@ -1,5 +1,5 @@
 import { Select, SelectItem } from '@/components/ui/select';
-import type { VisionFolder } from '@/pages/profiles/hooks/useVisionFolders';
+import type { VisionFolder } from '@/hooks/useVisionFolders';
 import type { Profile } from '@/pages/profiles/types';
 
 interface ProfileSelectorProps {

@@ -5,9 +5,11 @@ import { useFilters } from './hooks/useFilters';
 import { useFiltersOptions } from './hooks/useFiltersOptions';
 import { usePagination } from './hooks/usePagination';
 import { usePostsQuery } from './hooks/usePostsQuery';
+import { useCreativeDialog } from './hooks/useCreativeDialog';
 import { ContentFilters } from './components/content-filters';
 import { ContentCard } from './components/content-card';
 import { ContentPagination } from './components/pagination';
+import { CreativeDialog } from './components/creative-dialog';
 
 export const ContentPage = () => {
     const { filters, setFilter, clearAll } = useFilters();
@@ -18,6 +20,7 @@ export const ContentPage = () => {
         pageSize,
         filters,
     });
+    const { open, selectedPost, openPost, setOpen } = useCreativeDialog();
 
     useEffect(() => {
         setPage(1);
@@ -71,7 +74,7 @@ export const ContentPage = () => {
                     <>
                         <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
                             {items.map(post => (
-                                <ContentCard key={post.hash} post={post} />
+                                <ContentCard key={post.hash} post={post} onClick={openPost} />
                             ))}
                         </div>
 
@@ -86,6 +89,8 @@ export const ContentPage = () => {
                     </>
                 )}
             </QueryPageGuard>
+
+            <CreativeDialog open={open} onOpenChange={setOpen} post={selectedPost} />
         </div>
     );
 };

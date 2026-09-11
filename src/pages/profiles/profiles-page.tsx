@@ -7,12 +7,11 @@ import { Card } from '@/components/ui/card';
 import { StatCard } from '@/components/stat-card';
 import { Spinner } from '@/components/ui/spinner';
 import { QueryPageGuard } from '@/components/errors/query-page-guard';
-import { useVisionFolders } from './hooks/useVisionFolders';
-import { useVisionProfiles } from './hooks/useVisionProfiles';
+import { useVisionFolders } from '@/hooks/useVisionFolders';
+import { useVisionProfiles } from '@/hooks/useVisionProfiles';
 import { useActiveProfiles } from './hooks/useActiveProfiles';
 import { useScannerStatus } from './hooks/useScannerStatus';
 import { useVisionReady } from './hooks/useVisionReady';
-import { useProfileActions } from './hooks/useProfileActions';
 import { ProfileTableRow } from './components/profile-table-row';
 
 const PAGE_SIZE = 8;
@@ -37,25 +36,8 @@ export const ProfilesPage = () => {
         refreshActiveProfiles,
         isVisionActive,
     } = useActiveProfiles(folderId);
-    const { startPolling, confirmStopped, isScannerRunning, isScannerPaused, pauseMsLeft } =
-        useScannerStatus(profiles);
+    const { isScannerRunning, isScannerPaused, pauseMsLeft } = useScannerStatus(profiles);
     const { isVisionReady } = useVisionReady(profiles, isVisionActive);
-    const {
-        handleRunVision,
-        handleRunScanner,
-        handleStopScanner,
-        handleStopVision,
-        startingIds,
-        stoppingIds,
-        scannerStartingIds,
-        scannerStoppingIds,
-    } = useProfileActions({
-        folderId,
-        refreshActiveProfiles,
-        startPolling,
-        confirmStopped,
-        isScannerRunning,
-    });
 
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -157,19 +139,12 @@ export const ProfilesPage = () => {
                                 <ProfileTableRow
                                     key={profile.id}
                                     profile={profile}
+                                    folderId={folderId}
                                     active={isVisionActive(profile.id)}
-                                    scanner={isScannerRunning(profile.id)}
+                                    visionReady={isVisionReady(profile.id)}
                                     paused={isScannerPaused(profile.id)}
                                     pauseMsLeft={pauseMsLeft(profile.id)}
-                                    stopping={stoppingIds[profile.id] ?? false}
-                                    starting={startingIds[profile.id] ?? false}
-                                    scannerStopping={scannerStoppingIds[profile.id] ?? false}
-                                    scannerStarting={scannerStartingIds[profile.id] ?? false}
-                                    visionReady={isVisionReady(profile.id)}
-                                    handleRunVision={handleRunVision}
-                                    handleStopVision={handleStopVision}
-                                    handleRunScanner={handleRunScanner}
-                                    handleStopScanner={handleStopScanner}
+                                    scannerRunning={isScannerRunning(profile.id)}
                                 />
                             ))}
                         </TableBody>
