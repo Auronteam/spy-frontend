@@ -26,7 +26,7 @@ export const SettingsPage = () => {
     };
 
     return (
-        <div className="flex max-w-[860px] flex-col gap-5">
+        <div className="flex flex-col gap-5">
             <div>
                 <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
