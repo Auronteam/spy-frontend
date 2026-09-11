@@ -34,7 +34,12 @@ export const ScannerButtons = ({
     if (!scanner.running) {
         const disabled = !vision.active || vision.starting || vision.stopping || !vision.ready;
         return (
-            <Button variant="outline" size="sm" disabled={disabled} onClick={onRunScanner}>
+            <Button
+                size="sm"
+                disabled={disabled}
+                onClick={onRunScanner}
+                className="bg-green-600 text-white hover:bg-green-700"
+            >
                 Start scanner
             </Button>
         );
@@ -42,7 +47,7 @@ export const ScannerButtons = ({
 
     // Scanner is running
     return (
-        <Button variant="outline" size="sm" onClick={onStopScanner}>
+        <Button variant="destructive" size="sm" onClick={onStopScanner}>
             Stop scanner
         </Button>
     );

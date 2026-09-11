@@ -22,6 +22,12 @@ export function getDriveFileSrc(idOrUrl?: string): string | undefined {
     return fileId ? withAuthToken(`${BACKEND_BASE}/api/google/drive/file/${fileId}`) : undefined;
 }
 
+const DRIVE_FOLDER_BASE_URL = 'https://drive.google.com/drive/folders';
+
+export function getDriveFolderUrl(folderId: string): string {
+    return `${DRIVE_FOLDER_BASE_URL}/${folderId}`;
+}
+
 export function getFlagEmoji(countryCode: string): string {
     const codePoints = countryCode
         .toUpperCase()
