@@ -103,10 +103,10 @@ export const CreativeDialog = ({ open, onOpenChange, post }: CreativeDialogProps
                                         onCopy={copyToClipboard}
                                     />
                                 )}
-                                {post.landingArchiveUrl && (
+                                {post.googleDriveFolderId && (
                                     <CreativeLinkRow
                                         label="Archive link to Google Drive"
-                                        url={post.landingArchiveUrl}
+                                        url={`https://drive.google.com/drive/folders/${post.googleDriveFolderId}`}
                                         copyKey="archive"
                                         copiedKey={copiedKey}
                                         onCopy={copyToClipboard}
