@@ -54,7 +54,7 @@ export const VisionButtons = ({ vision, onRunVision, onStopVision }: VisionButto
     }
 
     return (
-        <Button variant="outline" size="sm" onClick={onStopVision}>
+        <Button variant="destructive" size="sm" onClick={onStopVision}>
             Disconnect
         </Button>
     );
