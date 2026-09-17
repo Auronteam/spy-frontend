@@ -22,6 +22,12 @@ dist-ssr
 # Claude Code session scratch (not shared conventions)
 .claude/scratchpad/
 
+# Audit notes and findings — working notes for us, not project docs
+.claude/audits/
+
+# Design mockup exports (reference only, not project source)
+\# CRM UI Mockups shadcn/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

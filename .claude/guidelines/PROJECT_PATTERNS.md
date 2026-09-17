@@ -91,6 +91,11 @@ Component/props/hook rules (arrow functions, named exports, `<ComponentName>Prop
 150-line guidance, etc.) are the general `AI_GUIDELINES.md` rules — nothing
 project-specific to add there.
 
+**Docs vs. audit notes:** `docs/` is for human-readable project
+documentation, committed to git. Audit findings, followups, and other
+working notes for us are not project docs — they live in `.claude/audits/`,
+which is gitignored and never committed.
+
 ---
 
 # Routing System
