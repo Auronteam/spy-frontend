@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { skipToken, useQuery } from '@tanstack/react-query';
 import { fetchProfileLogContent, fetchProfileLogFiles } from '@/api/logs';
 import { notifyError } from '@/lib/errors/notify-error';
+import { queryKeys } from '@/lib/query-keys';
 import type { LogFile } from '../types';
 
 const CONTENT_LINES = '1000';
@@ -26,7 +27,7 @@ export function useProfileLogFiles(
     isLiveMode: boolean
 ): UseProfileLogFilesResult {
     const filesQuery = useQuery({
-        queryKey: ['logs', 'files', profileId],
+        queryKey: queryKeys.logs.files(profileId),
         queryFn: profileId ? () => fetchProfileLogFiles(profileId) : skipToken,
     });
     const files = filesQuery.data?.files ?? EMPTY_FILES;
@@ -49,7 +50,7 @@ export function useProfileLogFiles(
     // can't show a stale response — each file has its own cache entry instead of
     // shared state a late race could overwrite.
     const contentQuery = useQuery({
-        queryKey: ['logs', 'content', profileId, selectedFile],
+        queryKey: queryKeys.logs.content(profileId, selectedFile),
         queryFn:
             selectedFile && !isLiveMode
                 ? ({ signal }: { signal: AbortSignal }) =>

@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchActiveVisionProfiles } from '@/api/vision-browser';
+import { queryKeys } from '@/lib/query-keys';
 
 export const useActiveProfiles = (folderId: string | null) => {
     const { data, isLoading, error, refetch } = useQuery({
-        queryKey: ['vision', 'active-profiles'],
+        queryKey: queryKeys.vision.activeProfiles(),
         queryFn: fetchActiveVisionProfiles,
         enabled: !!folderId,
         refetchInterval: folderId ? 3000 : false,

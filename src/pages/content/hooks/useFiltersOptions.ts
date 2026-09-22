@@ -3,14 +3,15 @@ import { useQuery } from '@tanstack/react-query';
 import { getCategoriesList } from '@/api/db/categories';
 import { getCountriesList } from '@/api/db/countries';
 import { notifyError } from '@/lib/errors/notify-error';
+import { queryKeys } from '@/lib/query-keys';
 
 export function useFiltersOptions() {
     const categoriesQuery = useQuery({
-        queryKey: ['categories', 'list'],
+        queryKey: queryKeys.categories.list(),
         queryFn: getCategoriesList,
     });
     const countriesQuery = useQuery({
-        queryKey: ['countries', 'list'],
+        queryKey: queryKeys.countries.list(),
         queryFn: getCountriesList,
     });
 

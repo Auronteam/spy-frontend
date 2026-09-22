@@ -5,18 +5,18 @@ import {
     getCategoriesList,
     updateCategory,
 } from '@/api/db/categories';
-
-const CATEGORIES_QUERY_KEY = ['categories', 'list'];
+import { queryKeys } from '@/lib/query-keys';
 
 export function useCategories() {
     const queryClient = useQueryClient();
 
     const query = useQuery({
-        queryKey: CATEGORIES_QUERY_KEY,
+        queryKey: queryKeys.categories.list(),
         queryFn: getCategoriesList,
     });
 
-    const invalidate = () => queryClient.invalidateQueries({ queryKey: CATEGORIES_QUERY_KEY });
+    const invalidate = () =>
+        queryClient.invalidateQueries({ queryKey: queryKeys.categories.all() });
 
     const createMutation = useMutation({
         mutationFn: createCategory,

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { runVisionProfile, stopVisionProfileOnServer } from '@/api/vision-browser';
 import { notifyError } from '@/lib/errors/notify-error';
+import { queryKeys } from '@/lib/query-keys';
 import { stopScannerAndWait } from './scanner-stop';
 
 export function useVisionActions(
@@ -14,7 +15,7 @@ export function useVisionActions(
     const runVisionMutation = useMutation({
         mutationFn: () => runVisionProfile(profileId, folderId ?? undefined),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['vision', 'active-profiles'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
         onError: e => notifyError(e),
     });
@@ -27,7 +28,7 @@ export function useVisionActions(
             await stopVisionProfileOnServer(profileId, folderId!);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['vision', 'active-profiles'] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
         onError: e => notifyError(e),
     });

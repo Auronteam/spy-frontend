@@ -1,6 +1,7 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
 import { fetchVisionProfiles } from '@/api/vision-browser';
 import type { Profile } from '@/pages/profiles/types';
+import { queryKeys } from '@/lib/query-keys';
 
 // Stable reference: while folderId isn't chosen yet, the query is disabled
 // (skipToken) and query.data stays undefined indefinitely — `?? []` would
@@ -10,7 +11,7 @@ const EMPTY_PROFILES: Profile[] = [];
 
 export const useVisionProfiles = (folderId: string | null) => {
     const query = useQuery({
-        queryKey: ['vision', 'profiles', folderId],
+        queryKey: queryKeys.vision.profiles(folderId),
         queryFn: folderId ? () => fetchVisionProfiles(folderId) : skipToken,
     });
 
