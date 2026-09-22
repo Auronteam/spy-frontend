@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchVisionFolders } from '@/api/vision-browser';
+import { queryKeys } from '@/lib/query-keys';
 
 export type VisionFolder = {
     id: string;
@@ -15,7 +16,7 @@ export const useVisionFolders = () => {
     const [folderId, setFolderId] = useState<string | null>(null);
 
     const query = useQuery({
-        queryKey: ['vision', 'folders'],
+        queryKey: queryKeys.vision.folders(),
         queryFn: fetchVisionFolders,
     });
 

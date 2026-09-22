@@ -2,6 +2,7 @@ import { useQueries } from '@tanstack/react-query';
 import { fetchScannerStatus } from '@/api/scanner';
 import type { ScannerStatus } from '@/api/scanner';
 import type { Profile } from '@/pages/profiles/types';
+import { queryKeys } from '@/lib/query-keys';
 
 const SCANNER_POLL_INTERVAL_MS = 15000;
 
@@ -12,7 +13,7 @@ const SCANNER_POLL_INTERVAL_MS = 15000;
 export const useScannerStatus = (profiles: Profile[]) => {
     const queries = useQueries({
         queries: profiles.map(profile => ({
-            queryKey: ['scanner', 'status', profile.id],
+            queryKey: queryKeys.scanner.status(profile.id),
             queryFn: () => fetchScannerStatus(profile.id),
             refetchInterval: (query: { state: { data?: ScannerStatus } }) =>
                 query.state.data?.running ? SCANNER_POLL_INTERVAL_MS : false,

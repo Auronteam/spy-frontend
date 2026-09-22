@@ -1,5 +1,6 @@
 import { useQueries } from '@tanstack/react-query';
 import { fetchVisionReady } from '@/api/vision-browser';
+import { queryKeys } from '@/lib/query-keys';
 
 interface Profile {
     id: string;
@@ -20,7 +21,7 @@ export function useVisionReady(
 ): UseVisionReadyReturn {
     const queries = useQueries({
         queries: profiles.map(profile => ({
-            queryKey: ['vision', 'ready', profile.id],
+            queryKey: queryKeys.vision.ready(profile.id),
             queryFn: () => fetchVisionReady(profile.id),
             enabled: isVisionActive(profile.id),
             refetchInterval: (query: { state: { data?: { ready: boolean } } }) =>

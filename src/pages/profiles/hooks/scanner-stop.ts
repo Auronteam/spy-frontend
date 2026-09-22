@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { fetchScannerStatus, stopScanner } from '@/api/scanner';
+import { queryKeys } from '@/lib/query-keys';
 
 const CONFIRM_MAX_ATTEMPTS = 20;
 const CONFIRM_INTERVAL_MS = 1500;
@@ -16,7 +17,7 @@ export async function waitForScannerStopped(
     queryClient: QueryClient,
     profileId: string
 ): Promise<void> {
-    const queryKey = ['scanner', 'status', profileId];
+    const queryKey = queryKeys.scanner.status(profileId);
 
     for (let attempt = 0; attempt < CONFIRM_MAX_ATTEMPTS; attempt++) {
         try {
