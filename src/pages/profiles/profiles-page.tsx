@@ -12,7 +12,10 @@ import { useVisionProfiles } from '@/hooks/useVisionProfiles';
 import { useActiveProfiles } from './hooks/useActiveProfiles';
 import { useScannerStatus } from './hooks/useScannerStatus';
 import { useVisionReady } from './hooks/useVisionReady';
+import { useCreateProfile } from './hooks/use-create-profile';
 import { ProfileTableRow } from './components/profile-table-row';
+import { AddProfileDialog } from './components/add-profile-dialog';
+import type { CreateProfileInput } from './types';
 
 const PAGE_SIZE = 8;
 
@@ -38,9 +41,20 @@ export const ProfilesPage = () => {
     } = useActiveProfiles(folderId);
     const { isScannerRunning, isScannerPaused, pauseMsLeft } = useScannerStatus(profiles);
     const { isVisionReady } = useVisionReady(profiles, isVisionActive);
+    const { createProfile, isCreating } = useCreateProfile(folderId);
 
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [addProfileOpen, setAddProfileOpen] = useState(false);
+
+    const handleCreateProfile = async (input: CreateProfileInput) => {
+        try {
+            await createProfile(input);
+            setAddProfileOpen(false);
+        } catch {
+            // toast already shown by useCreateProfile's onError — keep dialog open to retry
+        }
+    };
 
     const filteredProfiles = useMemo(() => {
         const q = search.trim().toLowerCase();
@@ -78,7 +92,7 @@ export const ProfilesPage = () => {
                     <Button variant="outline" onClick={handleRefresh}>
                         Refresh
                     </Button>
-                    <Button disabled title="Coming soon">
+                    <Button disabled={!folderId} onClick={() => setAddProfileOpen(true)}>
                         Add profile
                     </Button>
                 </div>
@@ -175,6 +189,13 @@ export const ProfilesPage = () => {
                     </div>
                 </QueryPageGuard>
             </Card>
+
+            <AddProfileDialog
+                open={addProfileOpen}
+                onOpenChange={setAddProfileOpen}
+                isPending={isCreating}
+                onSubmit={handleCreateProfile}
+            />
         </div>
     );
 };
