@@ -174,9 +174,9 @@ is in flight (`isLoading`).
   (`src/providers/`), mounted at the `App.tsx` root. Never import
   `sentry-factory.ts` directly.
 
-**Known gap:** no `queryCache.onError` hook yet — a throw inside a `queryFn`
-that isn't a network/`apiFetch` failure (a bug in the function itself) isn't
-currently reported to Sentry. Planned, not built.
+`QueryProvider` also sets a `queryCache.onError` hook: a throw inside a
+`queryFn` that isn't a network/`apiFetch` failure (a bug in the function
+itself, not caught by `isApiError`) is reported to Sentry via `captureError`.
 
 ---
 
@@ -216,22 +216,21 @@ currently reported to Sentry. Planned, not built.
 
 - `QueryClientProvider` is set up once, in `src/providers/query-provider.tsx`,
   mounted at the `App.tsx` root above the router (so route guards and every
-  page can use `useQuery`/`useMutation`). Current defaults: only
-  `mutations.onError` → `notifyError` (see Error Handling).
-- **Query keys are inline arrays at each call site** right now (e.g.
-  `['posts', page, pageSize, filters]`, `['vision', 'profiles', folderId]`) —
-  there is **no `queryKeys` factory yet**. Don't assume one exists; don't
-  invent one for a single call site either — this is a known, deliberate
-  gap (planned hardening pass), not something to silently fix mid-feature.
+  page can use `useQuery`/`useMutation`). Defaults: `mutations.onError` →
+  `notifyError` (see Error Handling); queries get `refetchOnWindowFocus:
+  false`, `staleTime: 30_000`, `gcTime: 5 * 60_000`, and `retry` that skips
+  retrying 4xx `ApiError`s (client mistakes won't fix themselves) but retries
+  once on everything else (5xx/network) — tuned for an internal tool where
+  several pages already poll on their own schedule.
+- **`queryKeys` factory** (`src/lib/query-keys.ts`) — every `queryKey` goes
+  through it (`queryKeys.vision.profiles(folderId)`,
+  `queryKeys.logs.content(profileId, file)`, ...), grouped by resource. Don't
+  reintroduce inline array keys at a call site; add a new entry to the
+  factory instead, following the existing per-resource shape.
 - **`skipToken` for conditionally-disabled queries**, not `enabled: false` +
   a non-null assertion on the query param — e.g. `useVisionProfiles`,
   `useProfileLogFiles`. This is the established style here; keep using it
   for any new query that depends on a value that might not exist yet.
-- **Known gap:** no explicit `retry`/`staleTime`/`refetchOnWindowFocus`
-  defaults — the app runs on TanStack's stock settings (3 retries with
-  backoff, refetch on window focus), which don't really suit an internal
-  tool where several pages already poll on their own schedule. On the list
-  for the same hardening pass as the queryKeys factory.
 
 ---
 

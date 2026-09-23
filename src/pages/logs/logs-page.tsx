@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BACKEND_BASE } from '@/config';
+import { downloadBlob } from '@/lib/download';
 import { useVisionFolders } from '@/hooks/useVisionFolders';
 import { useVisionProfiles } from '@/hooks/useVisionProfiles';
 import { useLogStream } from './hooks/use-log-stream';
@@ -47,6 +48,15 @@ export const LogsPage = () => {
         liveLogContent,
         logContent,
     });
+
+    const handleDownload = () => {
+        const content = isLiveMode ? liveLogContent : logContent;
+        const fileName = isLiveMode ? 'live-logs.log' : selectedFile;
+
+        if (!fileName || !content) return;
+
+        downloadBlob(new Blob([content], { type: 'text/plain' }), fileName);
+    };
 
     return (
         <div className="flex flex-col gap-5">
@@ -98,6 +108,7 @@ export const LogsPage = () => {
                         staticLogRef={staticLogRef}
                         onScroll={handleScroll}
                         onToggleLiveMode={toggleLiveMode}
+                        onDownload={handleDownload}
                     />
                 </div>
             )}

@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import { Download } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -64,6 +65,7 @@ interface LogContentViewerProps {
     staticLogRef: RefObject<HTMLDivElement | null>;
     onScroll: () => void;
     onToggleLiveMode: () => void;
+    onDownload: () => void;
 }
 
 export const LogContentViewer = ({
@@ -78,7 +80,10 @@ export const LogContentViewer = ({
     staticLogRef,
     onScroll,
     onToggleLiveMode,
+    onDownload,
 }: LogContentViewerProps) => {
+    const hasContent = isLiveMode ? Boolean(liveLogContent) : Boolean(logContent);
+
     return (
         <Card className="overflow-hidden p-0">
             <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 border-b px-3.5 py-2.5">
@@ -95,6 +100,17 @@ export const LogContentViewer = ({
                     {!isScannerRunning && !isLiveMode && (
                         <span className="text-xs text-muted-foreground">Scanner is off</span>
                     )}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={onDownload}
+                        disabled={!hasContent || contentLoading}
+                        aria-label="Download log"
+                        title="Download log"
+                    >
+                        <Download className="h-3.5 w-3.5" />
+                    </Button>
                     <Button
                         variant={isLiveMode ? 'outline' : 'default'}
                         size="sm"

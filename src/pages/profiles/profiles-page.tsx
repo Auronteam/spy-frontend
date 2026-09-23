@@ -72,7 +72,7 @@ export const ProfilesPage = () => {
     const scannersRunningCount = profiles.filter(p => isScannerRunning(p.id)).length;
 
     const isLoading = foldersLoading || profilesLoading;
-    const error = foldersError || profilesError || activeError;
+    const error = foldersError || profilesError;
 
     const handleRefresh = () => {
         refetchProfiles();
@@ -106,6 +106,12 @@ export const ProfilesPage = () => {
                         </SelectItem>
                     ))}
                 </Select>
+            )}
+
+            {activeError && (
+                <div className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                    Could not refresh active profiles — retrying...
+                </div>
             )}
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
