@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/api-fetch';
-import type { Profile } from '@/pages/profiles/types';
+import type { CreateProfileInput, Profile } from '@/pages/profiles/types';
 
 type StopVisionResponse = {
     ok: boolean;
@@ -19,6 +19,17 @@ export async function fetchVisionFolders(): Promise<Array<{ id: string; name?: s
 
 export async function fetchVisionProfiles(folderId: string): Promise<Profile[]> {
     return apiFetch(`/api/vision/folders/${encodeURIComponent(folderId)}/profiles`);
+}
+
+export async function createVisionProfile(
+    folderId: string,
+    input: CreateProfileInput
+): Promise<Record<string, unknown>> {
+    return apiFetch('/api/vision/profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folderId, ...input }),
+    });
 }
 
 export async function runVisionProfile(profileId: string, folderId?: string) {

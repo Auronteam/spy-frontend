@@ -12,8 +12,7 @@ pushed to directly.
 - Vite, React 19, TypeScript (strict)
 - `react-router-dom` for routing
 - `@tanstack/react-query` for server state
-- shadcn/ui (style "new-york", baseColor "neutral" — matches the old frontend's
-  design tokens exactly, see `src/index.css`)
+- shadcn/ui (style "new-york", baseColor "zinc" — see `src/index.css`)
 - `@sentry/react`, `sonner` for error tracking / toasts
 
 ## Getting started
@@ -32,8 +31,21 @@ pnpm dev
 - `pnpm lint` / `pnpm lint:fix`
 - `pnpm format` / `pnpm format:check`
 
+## Features
+
+- **Add profile** (Profiles page) — creates a Vision profile with a correct
+  Android antidetect fingerprint (device type, WebGL/Canvas/Audio/Client
+  Rects noise) via the backend's `POST /vision/profiles`, instead of doing
+  it by hand in the Vision desktop app. Optional proxy (`ip:port:user:pass`,
+  registered in Vision automatically) and cookies (paste JSON or drop the
+  account's cookie file) fields cover the rest of what manual setup used to
+  need — see `spy` repo's `docs/profile-setup.md` for what "correct" means
+  and `apps/backend/docs/api.md` for the endpoint contract.
+  Components: `src/pages/profiles/components/add-profile-dialog.tsx`,
+  `cookies-dropzone.tsx`; hook: `src/pages/profiles/hooks/use-create-profile.ts`.
+
 ## Status
 
-Scaffold only (Phase 1 of the migration plan) — dependencies, build tooling,
-and design tokens are in place. Routing, auth, and the actual pages come in
-follow-up branches.
+Past the initial scaffold (Phase 1) — routing, auth, and the core pages
+(Profiles, Content, Logs, Categories, Settings stub) are built and in use.
+See the `spy` repo's migration plan for what's still outstanding.
