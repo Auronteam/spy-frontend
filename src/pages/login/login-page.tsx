@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import { login } from '@/api/auth';
 import { useAuth } from '@/contexts/auth-context';
+import { isApiError } from '@/lib/errors/api-error';
 import { getHomeRoute } from '@/lib/routes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -34,16 +35,11 @@ export const LoginPage = () => {
 
         setIsLoading(true);
         try {
-            const response = await login(parse.data);
-
-            if (response.success && response.token && response.user) {
-                setSession(response.token, response.user);
-                navigate(getHomeRoute(response.user.role));
-            } else {
-                setError(response.error || 'Login failed');
-            }
-        } catch {
-            setError('An unexpected error occurred');
+            const { token, user } = await login(parse.data);
+            setSession(token, user);
+            navigate(getHomeRoute(user.role));
+        } catch (err) {
+            setError(isApiError(err) ? err.message : 'An unexpected error occurred');
         } finally {
             setIsLoading(false);
         }
