@@ -21,6 +21,9 @@ commit messages, and any committed docs/markdown (`docs/*.md` included). No
 Russian, even in something that starts as a scratch note if it ends up
 committed. This is about what lands in the repo, not the chat with the user.
 
+Communication with the user is the opposite: every report, plan, summary,
+question, and answer in the chat MUST be written in Russian, always.
+
 ---
 
 # Architecture

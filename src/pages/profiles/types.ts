@@ -7,6 +7,12 @@ export type Profile = {
     is_received: boolean;
     port: undefined | number;
     profile_name: string;
+    proxy: ProfileProxy | null;
+};
+
+export type ProfileProxy = {
+    ip: string;
+    port: number;
 };
 
 export type VisionState = {
@@ -36,4 +42,9 @@ export type CreateProfileInput = {
     profileName: string;
     proxyString?: string;
     cookies?: VisionCookie[];
+};
+
+export type UpdateProfileInput = {
+    profileName?: string;
+    proxyString?: string | null;
 };

@@ -12,10 +12,10 @@ import { useVisionProfiles } from '@/hooks/useVisionProfiles';
 import { useActiveProfiles } from './hooks/useActiveProfiles';
 import { useScannerStatus } from './hooks/useScannerStatus';
 import { useVisionReady } from './hooks/useVisionReady';
-import { useCreateProfile } from './hooks/use-create-profile';
+import { useProfileDialogs } from './hooks/use-profile-dialogs';
 import { ProfileTableRow } from './components/profile-table-row';
 import { AddProfileDialog } from './components/add-profile-dialog';
-import type { CreateProfileInput } from './types';
+import { EditProfileDialog } from './components/edit-profile-dialog';
 
 const PAGE_SIZE = 8;
 
@@ -41,20 +41,10 @@ export const ProfilesPage = () => {
     } = useActiveProfiles(folderId);
     const { isScannerRunning, isScannerPaused, pauseMsLeft } = useScannerStatus(profiles);
     const { isVisionReady } = useVisionReady(profiles, isVisionActive);
-    const { createProfile, isCreating } = useCreateProfile(folderId);
+    const { addDialog, editDialog, openAddDialog, openEditDialog } = useProfileDialogs(folderId);
 
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
-    const [addProfileOpen, setAddProfileOpen] = useState(false);
-
-    const handleCreateProfile = async (input: CreateProfileInput) => {
-        try {
-            await createProfile(input);
-            setAddProfileOpen(false);
-        } catch {
-            // toast already shown by useCreateProfile's onError — keep dialog open to retry
-        }
-    };
 
     const filteredProfiles = useMemo(() => {
         const q = search.trim().toLowerCase();
@@ -92,7 +82,7 @@ export const ProfilesPage = () => {
                     <Button variant="outline" onClick={handleRefresh}>
                         Refresh
                     </Button>
-                    <Button disabled={!folderId} onClick={() => setAddProfileOpen(true)}>
+                    <Button disabled={!folderId} onClick={openAddDialog}>
                         Add profile
                     </Button>
                 </div>
@@ -165,6 +155,7 @@ export const ProfilesPage = () => {
                                     paused={isScannerPaused(profile.id)}
                                     pauseMsLeft={pauseMsLeft(profile.id)}
                                     scannerRunning={isScannerRunning(profile.id)}
+                                    onEdit={openEditDialog}
                                 />
                             ))}
                         </TableBody>
@@ -196,12 +187,8 @@ export const ProfilesPage = () => {
                 </QueryPageGuard>
             </Card>
 
-            <AddProfileDialog
-                open={addProfileOpen}
-                onOpenChange={setAddProfileOpen}
-                isPending={isCreating}
-                onSubmit={handleCreateProfile}
-            />
+            <AddProfileDialog {...addDialog} />
+            <EditProfileDialog {...editDialog} />
         </div>
     );
 };
