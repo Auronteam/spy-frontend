@@ -7,6 +7,7 @@ import type { Profile } from '../types';
 import { VisionButtons } from './vision-buttons';
 import { ScannerButtons } from './scanner-buttons';
 import { ProfileActionButton } from './profile-action-button';
+import { ProxyInfo } from './proxy-info';
 
 interface ProfileTableRowProps {
     profile: Profile;
@@ -54,7 +55,10 @@ export const ProfileTableRow = ({
 
     return (
         <TableRow key={profile.id}>
-            <TableCell className="px-4 font-medium">{profile.name ?? profile.id}</TableCell>
+            <TableCell className="px-4 font-medium">{profile.name}</TableCell>
+            <TableCell className="px-4">
+                <ProxyInfo proxy={profile.proxy} />
+            </TableCell>
             <TableCell className="px-4">
                 {paused ? (
                     <Badge variant="warning">On Pause</Badge>

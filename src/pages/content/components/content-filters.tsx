@@ -1,14 +1,14 @@
 import type { DateRange } from 'react-day-picker';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MultiSelect } from './multiselect';
+import { MultiSelect, type MultiSelectOption } from './multiselect';
 import { RangePicker } from './range-picker';
 import type { Filters } from '../hooks/useFilters';
 
 interface ContentFiltersProps {
     filters: Filters;
-    categoriesOptions: string[];
-    countriesOptions: string[];
+    categoriesOptions: MultiSelectOption[];
+    countriesOptions: MultiSelectOption[];
     onCategoriesChange: (value: string[]) => void;
     onCountriesChange: (value: string[]) => void;
     onDateRangeChange: (range: DateRange | undefined) => void;

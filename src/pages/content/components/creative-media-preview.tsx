@@ -5,6 +5,7 @@ interface CreativeMediaPreviewProps {
     hasVideo: boolean;
     videoSrc?: string;
     posterSrc?: string;
+    alt: string;
 }
 
 export const CreativeMediaPreview = ({
@@ -12,6 +13,7 @@ export const CreativeMediaPreview = ({
     hasVideo,
     videoSrc,
     posterSrc,
+    alt,
 }: CreativeMediaPreviewProps) => {
     return (
         <div className="relative w-full overflow-hidden rounded-lg bg-muted md:h-full">
@@ -26,11 +28,7 @@ export const CreativeMediaPreview = ({
                     className="block h-full w-full object-contain"
                 />
             ) : (
-                <img
-                    src={posterSrc}
-                    alt="Creative preview"
-                    className="block h-full w-full object-contain"
-                />
+                <img src={posterSrc} alt={alt} className="block h-full w-full object-contain" />
             )}
             {hasVideo && (
                 <Badge variant="secondary" className="absolute left-2 top-2">

@@ -17,8 +17,9 @@ import { ProfileTableRow } from './components/profile-table-row';
 import { AddProfileDialog } from './components/add-profile-dialog';
 import { EditProfileDialog } from './components/edit-profile-dialog';
 import { DeleteProfileDialog } from './components/delete-profile-dialog';
+import { formatPageSummary } from './utils/format-page-summary';
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 10;
 
 export const ProfilesPage = () => {
     const {
@@ -51,7 +52,7 @@ export const ProfilesPage = () => {
     const filteredProfiles = useMemo(() => {
         const q = search.trim().toLowerCase();
         if (!q) return profiles;
-        return profiles.filter(p => (p.name ?? p.id).toLowerCase().includes(q));
+        return profiles.filter(p => p.name.toLowerCase().includes(q));
     }, [profiles, search]);
 
     const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / PAGE_SIZE));
@@ -141,6 +142,7 @@ export const ProfilesPage = () => {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="px-4">Profile name</TableHead>
+                                <TableHead className="px-4">Proxy</TableHead>
                                 <TableHead className="px-4">Connection</TableHead>
                                 <TableHead className="px-4">Scanner</TableHead>
                                 <TableHead className="px-4 text-right">Actions</TableHead>
@@ -166,7 +168,13 @@ export const ProfilesPage = () => {
 
                     <div className="flex items-center justify-between border-t px-4 py-2.5 text-xs text-muted-foreground">
                         <span>
-                            {filteredProfiles.length} of {profiles.length} profiles
+                            {formatPageSummary(
+                                currentPage,
+                                PAGE_SIZE,
+                                pagedProfiles.length,
+                                filteredProfiles.length,
+                                profiles.length
+                            )}
                         </span>
                         <div className="flex gap-1.5">
                             <Button

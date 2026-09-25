@@ -3,9 +3,10 @@ import { Check, Copy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { getFlagEmoji } from '@/lib/country';
 import { formatIsoToDMY } from '@/lib/utils';
 import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
-import { getDriveFileSrc, getDriveFolderUrl, getFlagEmoji } from '../utils';
+import { getDriveFileSrc, getDriveFolderUrl } from '../utils';
 import type { Post } from '../types';
 import { CreativeMediaPreview } from './creative-media-preview';
 
@@ -91,6 +92,7 @@ export const CreativeDialog = ({ open, onOpenChange, post }: CreativeDialogProps
                                 hasVideo={hasVideo}
                                 videoSrc={videoSrc}
                                 posterSrc={posterSrc}
+                                alt={`Creative preview — ${post.category.title}, ${post.geo}`}
                             />
 
                             <div className="flex flex-col gap-2.5">

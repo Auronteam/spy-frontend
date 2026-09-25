@@ -27,7 +27,7 @@ export const DeleteProfileDialog = ({
 
     useEffect(() => {
         if (profile) {
-            setProfileName(profile.profile_name);
+            setProfileName(profile.name);
         }
     }, [profile]);
 

@@ -44,7 +44,7 @@ export const ProfileSelector = ({
                 </SelectItem>
                 {profiles.map(profile => (
                     <SelectItem key={profile.id} value={profile.id}>
-                        {profile.name ?? profile.id}
+                        {profile.name}
                     </SelectItem>
                 ))}
             </Select>

@@ -2,8 +2,13 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+export type MultiSelectOption = {
+    value: string;
+    label: string;
+};
+
 interface MultiSelectProps {
-    options: string[];
+    options: MultiSelectOption[];
     value: string[];
     onChange: (next: string[]) => void;
     placeholder?: string;
@@ -25,7 +30,7 @@ export const MultiSelect = ({
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return options;
-        return options.filter(o => o.toLowerCase().includes(q));
+        return options.filter(o => o.label.toLowerCase().includes(q));
     }, [options, query]);
 
     // close on outside click
@@ -47,7 +52,7 @@ export const MultiSelect = ({
         else onChange([...value, opt]);
     };
 
-    const selectAll = () => onChange(options);
+    const selectAll = () => onChange(options.map(o => o.value));
     const clearAll = () => onChange([]);
 
     return (
@@ -61,7 +66,7 @@ export const MultiSelect = ({
                     {value.length === 0
                         ? placeholder
                         : value.length === 1
-                          ? value[0]
+                          ? (options.find(o => o.value === value[0])?.label ?? value[0])
                           : `${value.length} selected`}
                 </span>
                 <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
@@ -85,19 +90,19 @@ export const MultiSelect = ({
                             </div>
                         )}
                         {filtered.map(opt => {
-                            const checked = value.includes(opt);
+                            const checked = value.includes(opt.value);
                             return (
                                 <label
-                                    key={opt}
+                                    key={opt.value}
                                     className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
                                 >
                                     <input
                                         type="checkbox"
                                         className="h-4 w-4"
                                         checked={checked}
-                                        onChange={() => toggle(opt)}
+                                        onChange={() => toggle(opt.value)}
                                     />
-                                    <span className="truncate">{opt}</span>
+                                    <span className="truncate">{opt.label}</span>
                                 </label>
                             );
                         })}

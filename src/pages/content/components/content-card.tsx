@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
-import { getDriveFileSrc, getFlagEmoji } from '../utils';
+import { getFlagEmoji } from '@/lib/country';
+import { getDriveFileSrc } from '../utils';
 import type { Post } from '../types';
 
 interface ContentCardProps {

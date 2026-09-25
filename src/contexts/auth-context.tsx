@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { type AuthUser, verifyToken } from '@/api/auth';
 import { forceLogout } from '@/lib/api-fetch';
 import { clearClientAuthToken, getClientAuthToken, setClientAuthToken } from '@/lib/client-auth';
+import { isApiError } from '@/lib/errors/api-error';
 
 interface AuthContextType {
     user: AuthUser | null;
@@ -28,17 +29,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
 
         let cancelled = false;
-        verifyToken(token).then(result => {
-            if (cancelled) return;
-            if (result.success && result.user) {
-                setUser(result.user);
-            } else {
-                // Stale/invalid token — clear it so the next load doesn't retry
-                // a verify call that's already known to fail.
-                clearClientAuthToken();
-            }
-            setIsLoading(false);
-        });
+        verifyToken(token)
+            .then(result => {
+                if (!cancelled) setUser(result.user);
+            })
+            .catch((err: unknown) => {
+                if (cancelled) return;
+                if (isApiError(err) && err.status !== undefined) clearClientAuthToken();
+            })
+            .finally(() => {
+                if (!cancelled) setIsLoading(false);
+            });
 
         return () => {
             cancelled = true;
