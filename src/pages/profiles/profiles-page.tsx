@@ -16,6 +16,7 @@ import { useProfileDialogs } from './hooks/use-profile-dialogs';
 import { ProfileTableRow } from './components/profile-table-row';
 import { AddProfileDialog } from './components/add-profile-dialog';
 import { EditProfileDialog } from './components/edit-profile-dialog';
+import { DeleteProfileDialog } from './components/delete-profile-dialog';
 
 const PAGE_SIZE = 8;
 
@@ -41,7 +42,8 @@ export const ProfilesPage = () => {
     } = useActiveProfiles(folderId);
     const { isScannerRunning, isScannerPaused, pauseMsLeft } = useScannerStatus(profiles);
     const { isVisionReady } = useVisionReady(profiles, isVisionActive);
-    const { addDialog, editDialog, openAddDialog, openEditDialog } = useProfileDialogs(folderId);
+    const { addDialog, editDialog, deleteDialog, openAddDialog, openEditDialog, openDeleteDialog } =
+        useProfileDialogs(folderId);
 
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -156,6 +158,7 @@ export const ProfilesPage = () => {
                                     pauseMsLeft={pauseMsLeft(profile.id)}
                                     scannerRunning={isScannerRunning(profile.id)}
                                     onEdit={openEditDialog}
+                                    onDelete={openDeleteDialog}
                                 />
                             ))}
                         </TableBody>
@@ -189,6 +192,7 @@ export const ProfilesPage = () => {
 
             <AddProfileDialog {...addDialog} />
             <EditProfileDialog {...editDialog} />
+            <DeleteProfileDialog {...deleteDialog} />
         </div>
     );
 };

@@ -1,14 +1,12 @@
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
 import { useVisionActions } from '../hooks/useVisionActions';
 import { useScannerActions } from '../hooks/useScannerActions';
 import type { Profile } from '../types';
 import { VisionButtons } from './vision-buttons';
 import { ScannerButtons } from './scanner-buttons';
+import { ProfileActionButton } from './profile-action-button';
 
 interface ProfileTableRowProps {
     profile: Profile;
@@ -19,6 +17,7 @@ interface ProfileTableRowProps {
     pauseMsLeft: number;
     scannerRunning: boolean;
     onEdit: (profile: Profile) => void;
+    onDelete: (profile: Profile) => void;
 }
 
 export const ProfileTableRow = ({
@@ -30,6 +29,7 @@ export const ProfileTableRow = ({
     pauseMsLeft,
     scannerRunning,
     onEdit,
+    onDelete,
 }: ProfileTableRowProps) => {
     const vision = useVisionActions(profile.id, folderId, scannerRunning);
     const scanner = useScannerActions(profile.id, folderId);
@@ -50,6 +50,7 @@ export const ProfileTableRow = ({
     };
 
     const editLocked = profile.running || active;
+    const deleteLocked = editLocked || scannerRunning;
 
     return (
         <TableRow key={profile.id}>
@@ -92,24 +93,20 @@ export const ProfileTableRow = ({
                         onRunScanner={scanner.runScanner}
                         onStopScanner={scanner.stopScanner}
                     />
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <span className={cn('inline-flex', editLocked && 'cursor-not-allowed')}>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    disabled={editLocked}
-                                    onClick={() => onEdit(profile)}
-                                    aria-label="Edit profile"
-                                >
-                                    <Pencil />
-                                </Button>
-                            </span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            {editLocked ? 'Stop the profile to edit it' : 'Edit profile'}
-                        </TooltipContent>
-                    </Tooltip>
+                    <ProfileActionButton
+                        icon={<Pencil />}
+                        label="Edit profile"
+                        lockedHint="Stop the profile to edit it"
+                        locked={editLocked}
+                        onClick={() => onEdit(profile)}
+                    />
+                    <ProfileActionButton
+                        icon={<Trash2 />}
+                        label="Delete profile"
+                        lockedHint="Stop the profile to delete it"
+                        locked={deleteLocked}
+                        onClick={() => onDelete(profile)}
+                    />
                 </div>
             </TableCell>
         </TableRow>
