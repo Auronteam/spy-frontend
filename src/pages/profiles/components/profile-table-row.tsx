@@ -1,5 +1,9 @@
+import { Pencil } from 'lucide-react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import { useVisionActions } from '../hooks/useVisionActions';
 import { useScannerActions } from '../hooks/useScannerActions';
 import type { Profile } from '../types';
@@ -14,6 +18,7 @@ interface ProfileTableRowProps {
     paused: boolean;
     pauseMsLeft: number;
     scannerRunning: boolean;
+    onEdit: (profile: Profile) => void;
 }
 
 export const ProfileTableRow = ({
@@ -24,6 +29,7 @@ export const ProfileTableRow = ({
     paused,
     pauseMsLeft,
     scannerRunning,
+    onEdit,
 }: ProfileTableRowProps) => {
     const vision = useVisionActions(profile.id, folderId, scannerRunning);
     const scanner = useScannerActions(profile.id, folderId);
@@ -42,6 +48,8 @@ export const ProfileTableRow = ({
         starting: scanner.isStarting,
         stopping: scanner.isStopping,
     };
+
+    const editLocked = profile.running || active;
 
     return (
         <TableRow key={profile.id}>
@@ -84,6 +92,24 @@ export const ProfileTableRow = ({
                         onRunScanner={scanner.runScanner}
                         onStopScanner={scanner.stopScanner}
                     />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <span className={cn('inline-flex', editLocked && 'cursor-not-allowed')}>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    disabled={editLocked}
+                                    onClick={() => onEdit(profile)}
+                                    aria-label="Edit profile"
+                                >
+                                    <Pencil />
+                                </Button>
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {editLocked ? 'Stop the profile to edit it' : 'Edit profile'}
+                        </TooltipContent>
+                    </Tooltip>
                 </div>
             </TableCell>
         </TableRow>

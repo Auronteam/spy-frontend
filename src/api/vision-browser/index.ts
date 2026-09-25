@@ -1,5 +1,5 @@
 import { apiFetch } from '@/lib/api-fetch';
-import type { CreateProfileInput, Profile } from '@/pages/profiles/types';
+import type { CreateProfileInput, Profile, UpdateProfileInput } from '@/pages/profiles/types';
 
 type StopVisionResponse = {
     ok: boolean;
@@ -30,6 +30,21 @@ export async function createVisionProfile(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ folderId, ...input }),
     });
+}
+
+export async function updateVisionProfile(
+    folderId: string,
+    profileId: string,
+    input: UpdateProfileInput
+): Promise<Record<string, unknown>> {
+    return apiFetch(
+        `/api/vision/folders/${encodeURIComponent(folderId)}/profiles/${encodeURIComponent(profileId)}`,
+        {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(input),
+        }
+    );
 }
 
 export async function runVisionProfile(profileId: string, folderId?: string) {
