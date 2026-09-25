@@ -17,8 +17,9 @@ import { ProfileTableRow } from './components/profile-table-row';
 import { AddProfileDialog } from './components/add-profile-dialog';
 import { EditProfileDialog } from './components/edit-profile-dialog';
 import { DeleteProfileDialog } from './components/delete-profile-dialog';
+import { formatPageSummary } from './utils/format-page-summary';
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 10;
 
 export const ProfilesPage = () => {
     const {
@@ -167,7 +168,13 @@ export const ProfilesPage = () => {
 
                     <div className="flex items-center justify-between border-t px-4 py-2.5 text-xs text-muted-foreground">
                         <span>
-                            {filteredProfiles.length} of {profiles.length} profiles
+                            {formatPageSummary(
+                                currentPage,
+                                PAGE_SIZE,
+                                pagedProfiles.length,
+                                filteredProfiles.length,
+                                profiles.length
+                            )}
                         </span>
                         <div className="flex gap-1.5">
                             <Button
