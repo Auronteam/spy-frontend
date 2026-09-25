@@ -91,6 +91,7 @@ export const CreativeDialog = ({ open, onOpenChange, post }: CreativeDialogProps
                                 hasVideo={hasVideo}
                                 videoSrc={videoSrc}
                                 posterSrc={posterSrc}
+                                alt={`Creative preview — ${post.category.title}, ${post.geo}`}
                             />
 
                             <div className="flex flex-col gap-2.5">
