@@ -40,9 +40,17 @@ pnpm dev
   registered in Vision automatically) and cookies (paste JSON or drop the
   account's cookie file) fields cover the rest of what manual setup used to
   need — see `spy` repo's `docs/profile-setup.md` for what "correct" means
-  and `apps/backend/docs/api.md` for the endpoint contract.
+  and `docs/api.md` for the endpoint contract.
   Components: `src/pages/profiles/components/add-profile-dialog.tsx`,
   `cookies-dropzone.tsx`; hook: `src/pages/profiles/hooks/use-create-profile.ts`.
+- **Proxy country** (Profiles page) — the Proxy column and the edit dialog
+  show each profile's proxy as flag + country code + `ip:port` (e.g.
+  "🇵🇱 PL · 130.49.19.157:62497"), with the full country name in a tooltip.
+  The country is the proxy's exit country from Vision's own geo check, sent
+  by the backend as `proxy.country`; it's `null` until Vision has checked the
+  proxy, shown as "country unknown". Component:
+  `src/pages/profiles/components/proxy-info.tsx`; flag/name helpers:
+  `src/lib/country.ts`.
 
 ## Status
 
