@@ -54,7 +54,7 @@ export const ProfileTableRow = ({
 
     return (
         <TableRow key={profile.id}>
-            <TableCell className="px-4 font-medium">{profile.name ?? profile.id}</TableCell>
+            <TableCell className="px-4 font-medium">{profile.name}</TableCell>
             <TableCell className="px-4">
                 {paused ? (
                     <Badge variant="warning">On Pause</Badge>

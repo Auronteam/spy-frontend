@@ -34,19 +34,14 @@ export const EditProfileDialog = ({
     useEffect(() => {
         if (profile) {
             setCurrent(profile);
-            setProfileName(profile.profile_name);
+            setProfileName(profile.name);
             setProxyString(formatProxy(profile.proxy));
         }
     }, [profile]);
 
     const currentProxy = formatProxy(current?.proxy ?? null);
     const proxyRemoved = currentProxy !== '' && proxyString.trim() === '';
-    const update = buildProfileUpdate(
-        current?.profile_name ?? '',
-        profileName,
-        currentProxy,
-        proxyString
-    );
+    const update = buildProfileUpdate(current?.name ?? '', profileName, currentProxy, proxyString);
 
     const handleSubmit = () => {
         if (!update) return;

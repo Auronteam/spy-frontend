@@ -51,7 +51,7 @@ export const ProfilesPage = () => {
     const filteredProfiles = useMemo(() => {
         const q = search.trim().toLowerCase();
         if (!q) return profiles;
-        return profiles.filter(p => (p.name ?? p.id).toLowerCase().includes(q));
+        return profiles.filter(p => p.name.toLowerCase().includes(q));
     }, [profiles, search]);
 
     const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / PAGE_SIZE));
