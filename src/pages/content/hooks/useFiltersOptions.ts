@@ -4,6 +4,7 @@ import { getCategoriesList } from '@/api/db/categories';
 import { getCountriesList } from '@/api/db/countries';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
+import type { MultiSelectOption } from '../components/multiselect';
 
 export function useFiltersOptions() {
     const categoriesQuery = useQuery({
@@ -27,15 +28,18 @@ export function useFiltersOptions() {
         }
     }, [countriesQuery.isError, countriesQuery.error]);
 
-    const categoriesOptions = useMemo(
+    const categoriesOptions = useMemo<MultiSelectOption[]>(
         () =>
             (categoriesQuery.data ?? [])
-                .map(c => c.title.toLowerCase())
-                .sort((a, b) => a.localeCompare(b)),
+                .map(c => ({ value: c.slug, label: c.title }))
+                .sort((a, b) => a.label.localeCompare(b.label)),
         [categoriesQuery.data]
     );
-    const countriesOptions = useMemo(
-        () => [...(countriesQuery.data ?? [])].sort((a, b) => a.localeCompare(b)),
+    const countriesOptions = useMemo<MultiSelectOption[]>(
+        () =>
+            [...(countriesQuery.data ?? [])]
+                .sort((a, b) => a.localeCompare(b))
+                .map(code => ({ value: code, label: code })),
         [countriesQuery.data]
     );
 
