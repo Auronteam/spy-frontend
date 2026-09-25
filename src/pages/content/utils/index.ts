@@ -28,14 +28,6 @@ export function getDriveFolderUrl(folderId: string): string {
     return `${DRIVE_FOLDER_BASE_URL}/${folderId}`;
 }
 
-export function getFlagEmoji(countryCode: string): string {
-    const codePoints = countryCode
-        .toUpperCase()
-        .split('')
-        .map(char => 127397 + char.charCodeAt(0));
-    return String.fromCodePoint(...codePoints);
-}
-
 export function getPaginationRange(
     current: number,
     total: number,

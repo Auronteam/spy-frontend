@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { buildProfileUpdate, formatProxy } from '@/pages/profiles/utils/build-profile-update';
 import type { Profile, UpdateProfileInput } from '@/pages/profiles/types';
+import { ProxyInfo } from './proxy-info';
 
 interface EditProfileDialogProps {
     profile: Profile | null;
@@ -72,6 +73,12 @@ export const EditProfileDialog = ({
 
                     <div className="grid gap-2">
                         <Label htmlFor="edit-profile-proxy">Proxy</Label>
+                        {current?.proxy && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                Current proxy:
+                                <ProxyInfo proxy={current.proxy} />
+                            </div>
+                        )}
                         <div className="flex gap-2">
                             <Input
                                 id="edit-profile-proxy"

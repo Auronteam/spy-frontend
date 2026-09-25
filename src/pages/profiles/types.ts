@@ -8,6 +8,7 @@ export type Profile = {
 export type ProfileProxy = {
     ip: string;
     port: number;
+    country: string | null;
 };
 
 export type VisionState = {

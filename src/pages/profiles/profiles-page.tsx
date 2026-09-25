@@ -141,6 +141,7 @@ export const ProfilesPage = () => {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="px-4">Profile name</TableHead>
+                                <TableHead className="px-4">Proxy</TableHead>
                                 <TableHead className="px-4">Connection</TableHead>
                                 <TableHead className="px-4">Scanner</TableHead>
                                 <TableHead className="px-4 text-right">Actions</TableHead>
