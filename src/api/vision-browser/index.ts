@@ -47,6 +47,17 @@ export async function updateVisionProfile(
     );
 }
 
+export async function deleteVisionProfile(
+    folderId: string,
+    profileId: string
+): Promise<Record<string, unknown>> {
+    return apiFetch(
+        `/api/vision/folders/${encodeURIComponent(folderId)}/profiles/${encodeURIComponent(profileId)}`,
+        { method: 'DELETE' },
+        { silentErrorStatuses: [404, 409] }
+    );
+}
+
 export async function runVisionProfile(profileId: string, folderId?: string) {
     return apiFetch<{ ok: true; profileId: string; folderId: string; startedAt: string }>(
         '/api/vision/run',
