@@ -9,7 +9,14 @@ import { queryKeys } from '@/lib/query-keys';
 // (useScannerStatus, useVisionReady) keep `profiles` in their effect deps.
 const EMPTY_PROFILES: Profile[] = [];
 
-export const useVisionProfiles = (folderId: string | null) => {
+type UseVisionProfilesResult = {
+    profiles: Profile[];
+    loading: boolean;
+    error: Error | null;
+    refetch: () => void;
+};
+
+export function useVisionProfiles(folderId: string | null): UseVisionProfilesResult {
     const query = useQuery({
         queryKey: queryKeys.vision.profiles(folderId),
         queryFn: folderId ? () => fetchVisionProfiles(folderId) : skipToken,
@@ -21,4 +28,4 @@ export const useVisionProfiles = (folderId: string | null) => {
         error: query.error,
         refetch: query.refetch,
     };
-};
+}

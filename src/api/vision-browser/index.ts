@@ -8,6 +8,13 @@ type StopVisionResponse = {
     message?: string;
 };
 
+type RunVisionProfileResponse = {
+    ok: true;
+    profileId: string;
+    folderId: string;
+    startedAt: string;
+};
+
 type ActiveProfilesResponse =
     | Array<{ profile_id?: string }>
     | {
@@ -60,15 +67,15 @@ export async function deleteVisionProfile(
     );
 }
 
-export async function runVisionProfile(profileId: string, folderId?: string) {
-    return apiFetch<{ ok: true; profileId: string; folderId: string; startedAt: string }>(
-        '/api/vision/run',
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ profileId, folderId }),
-        }
-    );
+export async function runVisionProfile(
+    profileId: string,
+    folderId?: string
+): Promise<RunVisionProfileResponse> {
+    return apiFetch<RunVisionProfileResponse>('/api/vision/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profileId, folderId }),
+    });
 }
 
 export async function fetchActiveVisionProfiles(): Promise<ActiveProfilesResponse> {

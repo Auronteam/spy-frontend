@@ -31,10 +31,7 @@ export function fetchFreshScannerStatus(
 // timeout. Uses queryClient.fetchQuery so the same ['scanner','status',id]
 // cache that useScannerStatus reads updates live during the wait, instead of
 // only once at the end.
-export async function waitForScannerStopped(
-    queryClient: QueryClient,
-    profileId: string
-): Promise<void> {
+async function waitForScannerStopped(queryClient: QueryClient, profileId: string): Promise<void> {
     for (let attempt = 0; attempt < CONFIRM_MAX_ATTEMPTS; attempt++) {
         try {
             const status = await fetchFreshScannerStatus(queryClient, profileId);

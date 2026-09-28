@@ -3,8 +3,6 @@ import { mapPostDtoToPost } from '@/api/db/adapters';
 import type { PagedResponse, PostDto } from '@/api/db/dto';
 import { apiFetch } from '@/lib/api-fetch';
 
-export type { PagedResponse } from '@/api/db/dto';
-
 function endOfLocalDay(date: Date): Date {
     const end = new Date(date);
     end.setHours(23, 59, 59, 999);

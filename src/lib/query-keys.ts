@@ -7,7 +7,8 @@ export const queryKeys = {
     },
     scanner: {
         all: () => ['scanner'] as const,
-        status: (profileId: string) => [...queryKeys.scanner.all(), 'status', profileId] as const,
+        status: (profileId: string | null) =>
+            [...queryKeys.scanner.all(), 'status', profileId] as const,
     },
     posts: {
         all: () => ['posts'] as const,

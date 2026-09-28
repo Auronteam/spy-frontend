@@ -5,7 +5,6 @@ export type UseCreativeDialogResult = {
     open: boolean;
     selectedPost: Post | null;
     openPost: (post: Post) => void;
-    close: () => void;
     setOpen: (v: boolean) => void;
 };
 
@@ -18,10 +17,5 @@ export function useCreativeDialog(): UseCreativeDialogResult {
         setOpen(true);
     };
 
-    const close = () => {
-        setOpen(false);
-        setSelectedPost(null);
-    };
-
-    return { open, selectedPost, openPost, close, setOpen };
+    return { open, selectedPost, openPost, setOpen };
 }

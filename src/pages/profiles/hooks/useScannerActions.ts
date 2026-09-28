@@ -6,19 +6,28 @@ import { isApiError } from '@/lib/errors/api-error';
 import { mutationKeys, queryKeys } from '@/lib/query-keys';
 import { ScannerStopTimeoutError, stopScannerAndWait } from './scanner-stop';
 
-export function useScannerActions(profileId: string, folderId: string | null) {
+type UseScannerActionsResult = {
+    runScanner: () => void;
+    stopScanner: () => void;
+    isStarting: boolean;
+    isStopping: boolean;
+};
+
+export function useScannerActions(
+    profileId: string,
+    folderId: string | null
+): UseScannerActionsResult {
     const queryClient = useQueryClient();
 
     const runScannerMutation = useMutation({
         mutationKey: mutationKeys.scanner.run(profileId),
-        mutationFn: async () => {
-            await runScannerApi(profileId, folderId!);
+        mutationFn: async (selectedFolderId: string) => {
+            await runScannerApi(profileId, selectedFolderId);
             // Refetch now instead of guessing when the backend has actually
             // started it — the badge switches to Running as soon as the real
             // status says so.
             await queryClient.invalidateQueries({ queryKey: queryKeys.scanner.status(profileId) });
         },
-        onError: e => notifyError(e),
     });
 
     const stopScannerMutation = useMutation({
@@ -52,7 +61,7 @@ export function useScannerActions(profileId: string, folderId: string | null) {
             toast.error('Folder not selected');
             return;
         }
-        runScannerMutation.mutate();
+        runScannerMutation.mutate(folderId);
     };
 
     return {

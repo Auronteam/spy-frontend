@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import type { PaginationRangeItem } from '@/pages/content/types';
 import { getPaginationRange } from '../utils';
 
 type PageState<T> = {
@@ -6,7 +7,14 @@ type PageState<T> = {
     resetKey: T;
 };
 
-export function usePagination<T>(resetKey: T, pageSize = 24) {
+export type UsePaginationResult = {
+    page: number;
+    pageSize: number;
+    goToPage: (newPage: number, totalPages: number) => void;
+    getPagesRange: (totalPages: number) => PaginationRangeItem[];
+};
+
+export function usePagination<T>(resetKey: T, pageSize = 24): UsePaginationResult {
     const [state, setState] = useState<PageState<T>>({ page: 1, resetKey });
     const page = Object.is(state.resetKey, resetKey) ? state.page : 1;
 
@@ -19,15 +27,13 @@ export function usePagination<T>(resetKey: T, pageSize = 24) {
         }
     };
 
-    const pagesRange = useMemo(
-        () => (totalPages: number) => getPaginationRange(page, totalPages, 1),
-        [page]
-    );
+    const getPagesRange = (totalPages: number): PaginationRangeItem[] =>
+        getPaginationRange(page, totalPages, 1);
 
     return {
         page,
         pageSize,
         goToPage,
-        pagesRange,
+        getPagesRange,
     };
 }

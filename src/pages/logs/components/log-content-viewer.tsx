@@ -11,7 +11,12 @@ function splitLogLine(line: string): { time: string; message: string } {
     return match ? { time: match[1], message: match[2] } : { time: '', message: line };
 }
 
-function LiveStatusDot({ live, label }: { live: boolean; label: string }) {
+interface LiveStatusDotProps {
+    live: boolean;
+    label: string;
+}
+
+const LiveStatusDot = ({ live, label }: LiveStatusDotProps) => {
     return (
         <span
             className={`flex items-center gap-1.5 text-xs font-medium ${live ? 'text-green-700' : 'text-muted-foreground'}`}
@@ -20,9 +25,14 @@ function LiveStatusDot({ live, label }: { live: boolean; label: string }) {
             {label}
         </span>
     );
+};
+
+interface LogLinesProps {
+    content: string;
+    placeholder: string;
 }
 
-function LogLines({ content, placeholder }: { content: string; placeholder: string }) {
+const LogLines = ({ content, placeholder }: LogLinesProps) => {
     const lines = content.split('\n').filter(line => line.length > 0);
 
     if (lines.length === 0) {
@@ -51,7 +61,7 @@ function LogLines({ content, placeholder }: { content: string; placeholder: stri
             })}
         </>
     );
-}
+};
 
 interface LogContentViewerProps {
     selectedFile: string;

@@ -1,10 +1,14 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type UseMutateAsyncFunction } from '@tanstack/react-query';
 import { createVisionProfile } from '@/api/vision-browser';
-import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
 import type { CreateProfileInput } from '@/api/vision-browser/types';
 
-export function useCreateProfile(folderId: string | null) {
+type UseCreateProfileResult = {
+    createProfile: UseMutateAsyncFunction<Record<string, unknown>, Error, CreateProfileInput>;
+    isCreating: boolean;
+};
+
+export function useCreateProfile(folderId: string | null): UseCreateProfileResult {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
@@ -17,7 +21,6 @@ export function useCreateProfile(folderId: string | null) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.vision.profiles(folderId) });
         },
-        onError: e => notifyError(e),
     });
 
     return {

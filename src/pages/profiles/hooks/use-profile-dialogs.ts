@@ -6,7 +6,37 @@ import { isApiError } from '@/lib/errors/api-error';
 import type { CreateProfileInput, UpdateProfileInput } from '@/api/vision-browser/types';
 import type { Profile } from '@/types/profile';
 
-export function useProfileDialogs(folderId: string | null) {
+type AddDialogState = {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    isPending: boolean;
+    onSubmit: (input: CreateProfileInput) => Promise<void>;
+};
+
+type EditDialogState = {
+    profile: Profile | null;
+    onOpenChange: (open: boolean) => void;
+    isPending: boolean;
+    onSubmit: (input: UpdateProfileInput) => void;
+};
+
+type DeleteDialogState = {
+    profile: Profile | null;
+    onOpenChange: (open: boolean) => void;
+    isPending: boolean;
+    onConfirm: () => void;
+};
+
+type UseProfileDialogsResult = {
+    addDialog: AddDialogState;
+    editDialog: EditDialogState;
+    deleteDialog: DeleteDialogState;
+    openAddDialog: () => void;
+    openEditDialog: (profile: Profile) => void;
+    openDeleteDialog: (profile: Profile) => void;
+};
+
+export function useProfileDialogs(folderId: string | null): UseProfileDialogsResult {
     const { createProfile, isCreating } = useCreateProfile(folderId);
     const { updateProfile, isUpdating } = useUpdateProfile(folderId);
     const { deleteProfile, isDeleting } = useDeleteProfile(folderId);
@@ -20,7 +50,7 @@ export function useProfileDialogs(folderId: string | null) {
             await createProfile(input);
             setAddProfileOpen(false);
         } catch {
-            // toast already shown by useCreateProfile's onError — keep dialog open to retry
+            // toast already shown by the default mutation onError — keep dialog open to retry
         }
     };
 

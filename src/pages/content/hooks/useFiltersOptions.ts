@@ -6,7 +6,12 @@ import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
 import type { MultiSelectOption } from '../components/multiselect';
 
-export function useFiltersOptions() {
+export type UseFiltersOptionsResult = {
+    categoriesOptions: MultiSelectOption[];
+    countriesOptions: MultiSelectOption[];
+};
+
+export function useFiltersOptions(): UseFiltersOptionsResult {
     const categoriesQuery = useQuery({
         queryKey: queryKeys.categories.withPosts(),
         queryFn: getCategoriesWithPosts,
@@ -43,9 +48,5 @@ export function useFiltersOptions() {
         [countriesQuery.data]
     );
 
-    return {
-        categoriesOptions,
-        countriesOptions,
-        loading: categoriesQuery.isLoading || countriesQuery.isLoading,
-    };
+    return { categoriesOptions, countriesOptions };
 }

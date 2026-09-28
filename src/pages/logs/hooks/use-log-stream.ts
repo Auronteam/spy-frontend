@@ -26,6 +26,14 @@ const MAX_CONSECUTIVE_FAILURES = 5;
 // virtualization, so an hours-long watch would gradually hang the tab.
 const MAX_LIVE_LOG_LINES = 2000;
 
+function isLogStreamMessage(value: unknown): value is LogStreamMessage {
+    if (typeof value !== 'object' || value === null) return false;
+    if (!('type' in value) || typeof value.type !== 'string') return false;
+    return (
+        !('content' in value) || value.content === undefined || typeof value.content === 'string'
+    );
+}
+
 function appendCapped(prev: string, addition: string): string {
     const combined = prev + addition;
     const lines = combined.split('\n');
@@ -101,9 +109,10 @@ export function useLogStream(
         eventSource.onmessage = (event: MessageEvent<string>) => {
             failureCountRef.current = 0;
             try {
-                const data: LogStreamMessage = JSON.parse(event.data);
-                const content = data.content;
-                if (data.type === 'log' && content) {
+                const parsed: unknown = JSON.parse(event.data);
+                if (!isLogStreamMessage(parsed)) return;
+                const content = parsed.content;
+                if (parsed.type === 'log' && content) {
                     setLiveLogContent(prev => appendCapped(prev, content));
                 }
             } catch (error) {

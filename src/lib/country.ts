@@ -2,7 +2,7 @@ const REGIONAL_INDICATOR_OFFSET = 127397;
 
 const regionNames = new Intl.DisplayNames(['en'], { type: 'region', fallback: 'none' });
 
-export function isCountryCode(code: string): boolean {
+function isCountryCode(code: string): boolean {
     return /^[A-Za-z]{2}$/.test(code);
 }
 

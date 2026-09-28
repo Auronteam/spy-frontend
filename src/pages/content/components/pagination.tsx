@@ -9,9 +9,8 @@ import {
 } from '@/components/ui/pagination';
 import type { PaginationRangeItem } from '@/pages/content/types';
 
-interface PaginationProps {
+interface ContentPaginationProps {
     page: number;
-    totalPages: number;
     canPrev?: boolean;
     canNext?: boolean;
     pagesRange: PaginationRangeItem[];
@@ -26,7 +25,7 @@ export const ContentPagination = ({
     pagesRange,
     goToPage,
     className = '',
-}: PaginationProps) => {
+}: ContentPaginationProps) => {
     return (
         <div className={`mb-3 ${className}`}>
             <UIPagination>

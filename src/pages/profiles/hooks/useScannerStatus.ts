@@ -11,7 +11,14 @@ const SCANNER_IDLE_POLL_INTERVAL_MS = 30000;
 // Every profile is queried regardless of who started its scanner (or
 // whether it was already running before this page loaded). Running scanners
 // poll faster than stopped ones (function-form refetchInterval).
-export const useScannerStatus = (profiles: Profile[]) => {
+type UseScannerStatusResult = {
+    isScannerRunning: (profileId: string) => boolean;
+    isScannerPaused: (profileId: string) => boolean;
+    pauseMsLeft: (profileId: string) => number;
+    refreshScannerStatuses: () => Promise<void>;
+};
+
+export function useScannerStatus(profiles: Profile[]): UseScannerStatusResult {
     const queryClient = useQueryClient();
     const queries = useQueries({
         queries: profiles.map(profile => ({
@@ -48,4 +55,4 @@ export const useScannerStatus = (profiles: Profile[]) => {
         pauseMsLeft,
         refreshScannerStatuses,
     };
-};
+}

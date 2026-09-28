@@ -8,7 +8,7 @@ type BackendErrorBody = {
     error?: string | { code?: string; message?: string; details?: unknown };
 };
 
-export async function parseErrorBody(
+async function parseErrorBody(
     res: Response
 ): Promise<{ message: string; code?: string; details?: unknown }> {
     let body: BackendErrorBody | null = null;
@@ -64,7 +64,7 @@ function reportApiError(error: ApiError, path: string, options?: ApiFetchOptions
 
 const REQUEST_TIMEOUT_MS = 30_000;
 
-// Shared by apiFetch/apiFetchText/apiFetchRaw: makes the request, attaches auth
+// Shared by apiFetch/apiFetchText: makes the request, attaches auth
 // headers, and handles 401/errors — reading the success body is left to the caller.
 async function apiRequest(
     path: string,
@@ -142,14 +142,4 @@ export async function apiFetchText(
 ): Promise<string> {
     const res = await apiRequest(path, init, options);
     return res.text();
-}
-
-// For callers that need the raw Response (e.g. a blob download that reads
-// Content-Disposition) — the caller reads the body itself.
-export async function apiFetchRaw(
-    path: string,
-    init?: ApiFetchInit,
-    options?: ApiFetchOptions
-): Promise<Response> {
-    return apiRequest(path, init, options);
 }

@@ -1,10 +1,7 @@
 import { useQueries } from '@tanstack/react-query';
 import { fetchVisionReady } from '@/api/vision-browser';
 import { queryKeys } from '@/lib/query-keys';
-
-interface Profile {
-    id: string;
-}
+import type { Profile } from '@/types/profile';
 
 type UseVisionReadyReturn = {
     isVisionReady: (profileId: string) => boolean;
@@ -16,7 +13,7 @@ const READY_POLL_INTERVAL_MS = 2500;
 // per profile, enabled only while it's vision-active, polling stops itself
 // once ready:true comes back (function-form refetchInterval).
 export function useVisionReady(
-    profiles: Profile[],
+    profiles: Pick<Profile, 'id'>[],
     isVisionActive: (profileId: string) => boolean
 ): UseVisionReadyReturn {
     const queries = useQueries({

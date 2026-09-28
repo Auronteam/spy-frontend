@@ -1,16 +1,16 @@
 import { useEffect, useRef, type RefObject } from 'react';
 
-interface UseLogAutoScrollParams {
+type UseLogAutoScrollParams = {
     isLiveMode: boolean;
     liveLogContent: string;
     logContent: string;
-}
+};
 
-interface UseLogAutoScrollResult {
+type UseLogAutoScrollResult = {
     liveLogRef: RefObject<HTMLDivElement | null>;
     staticLogRef: RefObject<HTMLDivElement | null>;
     handleScroll: () => void;
-}
+};
 
 export function useLogAutoScroll({
     isLiveMode,

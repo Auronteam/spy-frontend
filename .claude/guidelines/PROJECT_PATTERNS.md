@@ -43,8 +43,8 @@ state/effects, services/api do data logic), applied here as:
   pieces local to one feature (a table row, a filter bar). Promoted to
   `src/components/` only once actually reused across features.
 - **`src/api/<resource>/`** — the data-fetching layer. One file per backend
-  resource, thin wrapper functions over `apiFetch`/`apiFetchText`/
-  `apiFetchRaw` (see Error Handling below). Components and hooks never call
+  resource, thin wrapper functions over `apiFetch`/`apiFetchText`
+  (see Error Handling below). Components and hooks never call
   `fetch()` themselves.
 - **`src/lib/`** — framework-agnostic utilities (`cn`, cookie/token helpers,
   route constants, the `apiFetch` wrapper itself, error classes).
@@ -78,7 +78,7 @@ src/
 │   ├── api-fetch.ts           # the fetch wrapper — see Error Handling
 │   ├── client-auth.ts         # cookie token read/write/clear, Authorization header building
 │   ├── routes.ts              # ROUTES const — every path lives here, never a raw string literal
-│   ├── utils.ts                # cn(), date/size formatters
+│   ├── utils.ts                # cn(), formatDate()
 │   └── errors/                # ApiError, Sentry lazy wrapper, notifyError
 └── config/                    # env var access (BACKEND_BASE from VITE_API_URL)
 ```
@@ -151,7 +151,7 @@ is in flight (`isLoading`).
   checks `instanceof` first, then falls back to a structural `__apiError`
   marker (protects against the class getting duplicated across bundle
   chunks, where `instanceof` across different module copies can lie).
-- **`apiFetch` / `apiFetchText` / `apiFetchRaw`** (`src/lib/api-fetch.ts`) —
+- **`apiFetch` / `apiFetchText`** (`src/lib/api-fetch.ts`) —
   the single chokepoint for every backend call. Handles, in one place:
   - attaching `Authorization: Bearer <token>` from the cookie
     (`authHeaders()`)
@@ -191,7 +191,7 @@ itself, not caught by `isApiError`) is reported to Sentry via `captureError`.
   exports for each operation (`fetchPosts`, `login`, `verifyToken`,
   `createCategory`, ...). Components and hooks call these — never `fetch()`
   or `apiFetch()` directly from a component/hook.
-- Every function goes through `apiFetch`/`apiFetchText`/`apiFetchRaw` — see
+- Every function goes through `apiFetch`/`apiFetchText` — see
   Error Handling above for what that buys automatically (auth header,
   timeout, 401 handling, Sentry reporting).
 - **DTO + adapter, applied selectively, not blanket:** where the backend

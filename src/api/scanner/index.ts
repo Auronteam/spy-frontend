@@ -1,15 +1,22 @@
 import { apiFetch } from '@/lib/api-fetch';
 
-export async function runScanner(profileId: string, folderId?: string) {
-    return apiFetch<{ ok: true; scannerId: string }>('/api/scanner/run', {
+type RunScannerResponse = { ok: true; scannerId: string };
+
+type StopScannerResponse = { ok: true; message: string };
+
+export async function runScanner(
+    profileId: string,
+    folderId?: string
+): Promise<RunScannerResponse> {
+    return apiFetch<RunScannerResponse>('/api/scanner/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profileId, folderId }),
     });
 }
 
-export async function stopScanner(profileId: string) {
-    return apiFetch<{ ok: true; message: string }>('/api/scanner/stop', {
+export async function stopScanner(profileId: string): Promise<StopScannerResponse> {
+    return apiFetch<StopScannerResponse>('/api/scanner/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profileId }),

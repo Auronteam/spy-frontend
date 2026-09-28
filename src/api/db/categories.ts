@@ -1,35 +1,13 @@
 import { apiFetch } from '@/lib/api-fetch';
 import type { PagedResponse } from '@/api/db/dto';
 
-export type { PagedResponse } from '@/api/db/dto';
-
 export type Category = {
     slug: string;
     title: string;
     protected: boolean;
-    search_enabled: boolean;
 };
 
 const MAX_PAGE_SIZE = 100;
-
-export async function fetchCategories(
-    page = 1,
-    pageSize = 10,
-    categoryFilter?: string
-): Promise<PagedResponse<Category>> {
-    const params = new URLSearchParams({
-        page: String(page),
-        pageSize: String(pageSize),
-    });
-
-    if (categoryFilter && categoryFilter.trim()) {
-        params.append('category', categoryFilter.trim());
-    }
-
-    return apiFetch<PagedResponse<Category>>(`/api/categories?${params.toString()}`, {
-        cache: 'no-store',
-    });
-}
 
 export async function getCategoriesList(): Promise<Category[]> {
     const data = await apiFetch<PagedResponse<Category>>(

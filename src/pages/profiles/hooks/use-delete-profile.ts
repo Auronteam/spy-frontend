@@ -1,11 +1,16 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type UseMutateFunction } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { deleteVisionProfile } from '@/api/vision-browser';
 import { isApiError } from '@/lib/errors/api-error';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
 
-export function useDeleteProfile(folderId: string | null) {
+type UseDeleteProfileResult = {
+    deleteProfile: UseMutateFunction<Record<string, unknown>, Error, string>;
+    isDeleting: boolean;
+};
+
+export function useDeleteProfile(folderId: string | null): UseDeleteProfileResult {
     const queryClient = useQueryClient();
 
     const invalidateProfiles = () =>

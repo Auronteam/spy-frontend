@@ -11,9 +11,9 @@ import { ContentPagination } from './components/pagination';
 import { CreativeDialog } from './components/creative-dialog';
 
 export const ContentPage = () => {
-    const { filters, setFilter, clearAll } = useFilters();
+    const { filters, setListFilter, setDateRange, clearAll } = useFilters();
     const { categoriesOptions, countriesOptions } = useFiltersOptions();
-    const { page, pageSize, goToPage, pagesRange } = usePagination(filters);
+    const { page, pageSize, goToPage, getPagesRange } = usePagination(filters);
     const { data, isLoading, isError, error, refetch } = usePostsQuery({
         page,
         pageSize,
@@ -43,9 +43,9 @@ export const ContentPage = () => {
                 filters={filters}
                 categoriesOptions={categoriesOptions}
                 countriesOptions={countriesOptions}
-                onCategoriesChange={value => setFilter('categories', value)}
-                onCountriesChange={value => setFilter('countries', value)}
-                onDateRangeChange={value => setFilter('createdAt', value)}
+                onCategoriesChange={values => setListFilter('categories', values)}
+                onCountriesChange={values => setListFilter('countries', values)}
+                onDateRangeChange={setDateRange}
                 onReset={clearAll}
             />
 
@@ -75,10 +75,9 @@ export const ContentPage = () => {
 
                         <ContentPagination
                             page={page}
-                            totalPages={totalPages}
                             canPrev={page > 1}
                             canNext={page < totalPages}
-                            pagesRange={pagesRange(totalPages)}
+                            pagesRange={getPagesRange(totalPages)}
                             goToPage={p => goToPage(p, totalPages)}
                         />
                     </>

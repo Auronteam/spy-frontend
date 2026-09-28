@@ -8,7 +8,7 @@ interface ProfileSelectorProps {
     onFolderChange: (folderId: string) => void;
     profiles: Profile[];
     profilesLoading: boolean;
-    selectedProfileId: string;
+    selectedProfileId: string | null;
     onProfileChange: (profileId: string) => void;
 }
 
@@ -34,7 +34,7 @@ export const ProfileSelector = ({
             )}
 
             <Select
-                value={selectedProfileId}
+                value={selectedProfileId ?? ''}
                 onValueChange={onProfileChange}
                 className="max-w-xs"
                 disabled={profilesLoading || profiles.length === 0}

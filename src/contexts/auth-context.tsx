@@ -4,14 +4,14 @@ import { forceLogout } from '@/lib/api-fetch';
 import { clearClientAuthToken, getClientAuthToken, setClientAuthToken } from '@/lib/client-auth';
 import { isApiError } from '@/lib/errors/api-error';
 
-interface AuthContextType {
+type AuthContextType = {
     user: AuthUser | null;
     isLoading: boolean;
     verifyError: string | null;
     retry: () => void;
     login: (token: string, user: AuthUser) => void;
     logout: () => void;
-}
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     );
 };
 
-export function useAuth() {
+export function useAuth(): AuthContextType {
     const context = useContext(AuthContext);
     if (context === undefined) {
         throw new Error('useAuth must be used within an AuthProvider');

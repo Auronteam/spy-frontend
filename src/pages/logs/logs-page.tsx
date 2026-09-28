@@ -15,7 +15,7 @@ export const LogsPage = () => {
     const { folders, folderId, setFolderId } = useVisionFolders();
     const { profiles, loading: profilesLoading } = useVisionProfiles(folderId);
 
-    const [selectedProfileId, setSelectedProfileId] = useState('');
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
 
     const streamUrl = selectedProfileId ? getLogStreamUrl(selectedProfileId) : '';
     const { isLiveMode, isConnected, liveLogContent, toggleLiveMode } = useLogStream(streamUrl, {
@@ -30,14 +30,14 @@ export const LogsPage = () => {
         if (isLiveMode) {
             toggleLiveMode();
         }
-        setSelectedProfileId(value);
+        setSelectedProfileId(value || null);
     };
 
     const handleFolderChange = (value: string) => {
         if (isLiveMode) {
             toggleLiveMode();
         }
-        setSelectedProfileId('');
+        setSelectedProfileId(null);
         setFolderId(value);
     };
 
@@ -49,7 +49,7 @@ export const LogsPage = () => {
         content: logContent,
         contentLoading,
         refetchFiles,
-    } = useProfileLogFiles(selectedProfileId || null, isLiveMode);
+    } = useProfileLogFiles(selectedProfileId, isLiveMode);
 
     const { liveLogRef, staticLogRef, handleScroll } = useLogAutoScroll({
         isLiveMode,

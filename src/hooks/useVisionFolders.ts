@@ -8,7 +8,15 @@ import type { VisionFolder } from '@/types/vision-folder';
 // literal on every render, which could loop the effect below.
 const EMPTY_FOLDERS: VisionFolder[] = [];
 
-export const useVisionFolders = () => {
+type UseVisionFoldersResult = {
+    folders: VisionFolder[];
+    folderId: string | null;
+    setFolderId: (folderId: string | null) => void;
+    loading: boolean;
+    error: Error | null;
+};
+
+export function useVisionFolders(): UseVisionFoldersResult {
     const [folderId, setFolderId] = useState<string | null>(null);
 
     const query = useQuery({
@@ -33,4 +41,4 @@ export const useVisionFolders = () => {
         loading: query.isLoading,
         error: query.error,
     };
-};
+}

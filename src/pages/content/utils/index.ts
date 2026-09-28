@@ -28,3 +28,16 @@ export function getPaginationRange(
     range.push(total);
     return range;
 }
+
+export function formatIsoToDMY(iso: string, separator: string = '.'): string {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+
+    // UTC, to avoid timezone shifts
+    const day = d.getUTCDate();
+    const month = d.getUTCMonth() + 1;
+    const year = d.getUTCFullYear();
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${pad(day)}${separator}${pad(month)}${separator}${year}`;
+}

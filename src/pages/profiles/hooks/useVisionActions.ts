@@ -9,7 +9,17 @@ import {
     stopScannerAndWait,
 } from './scanner-stop';
 
-export function useVisionActions(profileId: string, folderId: string | null) {
+type UseVisionActionsResult = {
+    runVision: () => void;
+    stopVision: () => void;
+    isStarting: boolean;
+    isStopping: boolean;
+};
+
+export function useVisionActions(
+    profileId: string,
+    folderId: string | null
+): UseVisionActionsResult {
     const queryClient = useQueryClient();
 
     const runVisionMutation = useMutation({
@@ -19,17 +29,16 @@ export function useVisionActions(profileId: string, folderId: string | null) {
             queryClient.removeQueries({ queryKey: queryKeys.vision.ready(profileId) });
             return queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
-        onError: e => notifyError(e),
     });
 
     const stopVisionMutation = useMutation({
         mutationKey: mutationKeys.vision.stop(profileId),
-        mutationFn: async () => {
+        mutationFn: async (selectedFolderId: string) => {
             const scannerStatus = await fetchFreshScannerStatus(queryClient, profileId);
             if (scannerStatus.running) {
                 await stopScannerAndWait(queryClient, profileId);
             }
-            await stopVisionProfileOnServer(profileId, folderId!);
+            await stopVisionProfileOnServer(profileId, selectedFolderId);
         },
         onSuccess: () => {
             queryClient.removeQueries({ queryKey: queryKeys.vision.ready(profileId) });
@@ -52,7 +61,7 @@ export function useVisionActions(profileId: string, folderId: string | null) {
             toast.error('Folder not selected');
             return;
         }
-        stopVisionMutation.mutate();
+        stopVisionMutation.mutate(folderId);
     };
 
     return {

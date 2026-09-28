@@ -1,7 +1,7 @@
 import { BACKEND_BASE } from '@/config';
 import { withAuthToken } from '@/lib/client-auth';
 
-export function extractDriveId(input?: string): string | undefined {
+function extractDriveId(input?: string): string | undefined {
     if (!input) return undefined;
     if (!input.includes('http') && /^[a-zA-Z0-9_-]{10,}$/.test(input)) return input;
     try {
