@@ -35,8 +35,17 @@ export function useLogStream(streamUrl: string): UseLogStreamResult {
     // Mirrors isLiveMode without waiting on batched setState — onerror reads this
     // from inside a setTimeout, where a state closure would be stale.
     const isLiveModeRef = useRef<boolean>(false);
+    const reconnectTimerRef = useRef<number | null>(null);
+
+    const clearReconnectTimer = useCallback(() => {
+        if (reconnectTimerRef.current !== null) {
+            window.clearTimeout(reconnectTimerRef.current);
+            reconnectTimerRef.current = null;
+        }
+    }, []);
 
     const connect = useCallback(() => {
+        clearReconnectTimer();
         if (eventSourceRef.current) {
             eventSourceRef.current.close();
         }
@@ -45,6 +54,7 @@ export function useLogStream(streamUrl: string): UseLogStreamResult {
         eventSourceRef.current = eventSource;
 
         eventSource.onopen = () => {
+            if (eventSourceRef.current !== eventSource) return;
             setIsConnected(true);
         };
 
@@ -61,23 +71,29 @@ export function useLogStream(streamUrl: string): UseLogStreamResult {
         };
 
         eventSource.onerror = () => {
+            if (eventSourceRef.current !== eventSource) return;
+            eventSource.close();
+            eventSourceRef.current = null;
             setIsConnected(false);
-            setTimeout(() => {
+            clearReconnectTimer();
+            reconnectTimerRef.current = window.setTimeout(() => {
+                reconnectTimerRef.current = null;
                 if (isLiveModeRef.current) {
                     connect();
                 }
             }, RECONNECT_DELAY_MS);
         };
-    }, [streamUrl]);
+    }, [streamUrl, clearReconnectTimer]);
 
     const disconnect = useCallback(() => {
+        clearReconnectTimer();
         if (eventSourceRef.current) {
             eventSourceRef.current.close();
             eventSourceRef.current = null;
         }
         setIsConnected(false);
         setLiveLogContent('');
-    }, []);
+    }, [clearReconnectTimer]);
 
     const toggleLiveMode = useCallback(() => {
         if (!isLiveModeRef.current) {
@@ -97,6 +113,7 @@ export function useLogStream(streamUrl: string): UseLogStreamResult {
 
     useEffect(() => {
         return () => {
+            isLiveModeRef.current = false;
             disconnect();
         };
     }, [disconnect]);
