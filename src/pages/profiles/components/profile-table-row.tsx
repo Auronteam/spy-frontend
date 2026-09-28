@@ -3,7 +3,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useVisionActions } from '../hooks/useVisionActions';
 import { useScannerActions } from '../hooks/useScannerActions';
-import type { Profile } from '../types';
+import type { Profile } from '@/types/profile';
 import { VisionButtons } from './vision-buttons';
 import { ScannerButtons } from './scanner-buttons';
 import { ProfileActionButton } from './profile-action-button';

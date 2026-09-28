@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CookiesDropzone } from '@/pages/profiles/components/cookies-dropzone';
 import { parseCookiesJson } from '@/pages/profiles/utils/parse-cookies';
-import type { CreateProfileInput } from '@/pages/profiles/types';
+import type { CreateProfileInput } from '@/api/vision-browser/types';
 
 interface AddProfileDialogProps {
     open: boolean;

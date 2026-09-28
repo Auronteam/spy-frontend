@@ -1,7 +1,7 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { fetchScannerStatus } from '@/api/scanner';
 import type { ScannerStatus } from '@/api/scanner';
-import type { Profile } from '@/pages/profiles/types';
+import type { Profile } from '@/types/profile';
 import { queryKeys } from '@/lib/query-keys';
 
 const SCANNER_POLL_INTERVAL_MS = 15000;

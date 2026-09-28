@@ -1,7 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getCountryName, getFlagEmoji } from '@/lib/country';
 import { formatProxy } from '@/pages/profiles/utils/build-profile-update';
-import type { ProfileProxy } from '../types';
+import type { ProfileProxy } from '@/types/profile';
 
 interface ProxyInfoProps {
     proxy: ProfileProxy | null;

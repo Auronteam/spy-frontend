@@ -3,7 +3,7 @@ import { updateVisionProfile } from '@/api/vision-browser';
 import { isApiError } from '@/lib/errors/api-error';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
-import type { UpdateProfileInput } from '@/pages/profiles/types';
+import type { UpdateProfileInput } from '@/api/vision-browser/types';
 
 type UpdateProfileVariables = {
     profileId: string;

@@ -1,6 +1,6 @@
 import { Select, SelectItem } from '@/components/ui/select';
-import type { VisionFolder } from '@/hooks/useVisionFolders';
-import type { Profile } from '@/pages/profiles/types';
+import type { VisionFolder } from '@/types/vision-folder';
+import type { Profile } from '@/types/profile';
 
 interface ProfileSelectorProps {
     folders: VisionFolder[];

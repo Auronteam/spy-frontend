@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { NAV_ITEMS } from '@/router/nav-items';
+import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -15,10 +16,7 @@ export const TopNav = () => {
     return (
         <header className="border-b bg-background">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-                <div className="flex items-center gap-2">
-                    <div className="h-6 w-6 rounded-sm bg-foreground" />
-                    <span className="font-semibold">Spy Console</span>
-                </div>
+                <Logo />
 
                 {user && (
                     <div className="flex items-center gap-3">

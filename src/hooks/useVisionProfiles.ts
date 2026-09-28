@@ -1,6 +1,6 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
 import { fetchVisionProfiles } from '@/api/vision-browser';
-import type { Profile } from '@/pages/profiles/types';
+import type { Profile } from '@/types/profile';
 import { queryKeys } from '@/lib/query-keys';
 
 // Stable reference: while folderId isn't chosen yet, the query is disabled

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BACKEND_BASE } from '@/config';
+import { getLogStreamUrl } from '@/api/logs';
 import { downloadBlob } from '@/lib/download';
 import { useVisionFolders } from '@/hooks/useVisionFolders';
 import { useVisionProfiles } from '@/hooks/useVisionProfiles';
@@ -17,9 +17,7 @@ export const LogsPage = () => {
 
     const [selectedProfileId, setSelectedProfileId] = useState('');
 
-    const streamUrl = selectedProfileId
-        ? `${BACKEND_BASE}/api/logs/stream?profileId=${encodeURIComponent(selectedProfileId)}`
-        : '';
+    const streamUrl = selectedProfileId ? getLogStreamUrl(selectedProfileId) : '';
     const { isLiveMode, isConnected, liveLogContent, toggleLiveMode } = useLogStream(streamUrl, {
         onGiveUp: () => refetchFiles(),
     });

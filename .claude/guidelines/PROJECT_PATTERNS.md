@@ -59,9 +59,10 @@ src/
 │   ├── <feature>-page.tsx    # route target — the only file imported by router.tsx
 │   ├── components/           # feature-local components
 │   ├── hooks/                # feature-local hooks (TanStack Query lives here)
-│   ├── types.ts              # feature-local domain types (if any)
+│   ├── types.ts              # feature-local UI types (if any)
 │   └── utils/                # feature-local pure helpers (if any)
 ├── api/<resource>/           # data-fetching per backend resource (index.ts)
+│   ├── types.ts              # domain types used only by this resource and its one feature page
 │   └── dto.ts / adapters.ts  # only where the wire shape needs adapting — see API System below
 ├── components/                # shared, cross-feature UI
 │   ├── ui/                   # shadcn primitives — treat as generated, edit sparingly
@@ -72,6 +73,7 @@ src/
 ├── contexts/                  # React Context providers (auth-context.tsx)
 ├── router/                    # createBrowserRouter config, ProtectedRoute/GuestRoute, DashboardLayout
 ├── providers/                  # app-level providers mounted once in App.tsx (QueryProvider, SentryInit)
+├── types/                     # shared domain types used by 2+ features (profile.ts, auth.ts, ...)
 ├── lib/                       # framework-agnostic utilities
 │   ├── api-fetch.ts           # the fetch wrapper — see Error Handling
 │   ├── client-auth.ts         # cookie token read/write/clear, Authorization header building
@@ -197,7 +199,7 @@ itself, not caught by `isApiError`) is reported to Sentry via `captureError`.
   domain type, there's a `dto.ts` (wire shape) + `adapters.ts` (mapper
   function) pair — e.g. `src/api/db/dto.ts`'s `PostDto` →
   `src/api/db/adapters.ts`'s `mapPostDtoToPost` → the camelCase `Post` type
-  in `src/pages/content/types.ts`. Where there's no case mismatch (e.g.
+  in `src/api/db/types.ts`. Where there's no case mismatch (e.g.
   `Category` — `slug`/`title`/`protected`, already flat), the wire shape
   *is* the domain type, used as-is — don't invent a DTO layer for a
   resource that doesn't need one just for consistency.
@@ -207,6 +209,12 @@ itself, not caught by `isApiError`) is reported to Sentry via `captureError`.
   payoff. The DTO type itself is the single point of control if a backend
   field changes; if a resource's contract turns out to need real runtime
   validation later, that's a deliberate decision to revisit, not a default.
+- **Where domain types live:** a type used only by one resource and its
+  single feature page goes in `src/api/<resource>/types.ts` (`Post`,
+  `LogFile`); a type used by 2+ features goes in `src/types/<name>.ts`
+  (`Profile`, `VisionFolder`); purely UI/feature-local types stay in
+  `src/pages/<feature>/types.ts`. Nothing outside `src/pages/` imports from
+  `src/pages/`.
 - Auth token: read from a plain (non-`httpOnly`) cookie via
   `getClientAuthToken()`/`setClientAuthToken()`/`clearClientAuthToken()`
   (`src/lib/client-auth.ts`) and sent as an explicit `Authorization` header —

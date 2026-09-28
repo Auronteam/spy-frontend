@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Post } from '@/pages/content/types';
+import type { Post } from '@/api/db/types';
 
 export type UseCreativeDialogResult = {
     open: boolean;

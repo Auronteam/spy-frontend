@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { getFlagEmoji } from '@/lib/country';
-import { getDriveFileSrc } from '../utils';
-import type { Post } from '../types';
+import { getDriveFileSrc } from '@/api/google';
+import type { Post } from '@/api/db/types';
 
 interface ContentCardProps {
     post: Post;

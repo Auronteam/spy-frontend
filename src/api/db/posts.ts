@@ -1,5 +1,4 @@
-import type { Filters } from '@/pages/content/hooks/useFilters';
-import type { Post } from '@/pages/content/types';
+import type { Post, PostFilters } from '@/api/db/types';
 import { mapPostDtoToPost } from '@/api/db/adapters';
 import type { PagedResponse, PostDto } from '@/api/db/dto';
 import { apiFetch } from '@/lib/api-fetch';
@@ -15,7 +14,7 @@ function endOfLocalDay(date: Date): Date {
 export async function fetchPosts(
     page = 1,
     pageSize = 24,
-    filters?: Filters
+    filters?: PostFilters
 ): Promise<PagedResponse<Post>> {
     const params = new URLSearchParams({
         page: String(page),

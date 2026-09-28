@@ -3,10 +3,10 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MultiSelect, type MultiSelectOption } from './multiselect';
 import { RangePicker } from './range-picker';
-import type { Filters } from '../hooks/useFilters';
+import type { PostFilters } from '@/api/db/types';
 
 interface ContentFiltersProps {
-    filters: Filters;
+    filters: PostFilters;
     categoriesOptions: MultiSelectOption[];
     countriesOptions: MultiSelectOption[];
     onCategoriesChange: (value: string[]) => void;

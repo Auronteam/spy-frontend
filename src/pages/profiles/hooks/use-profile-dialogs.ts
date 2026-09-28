@@ -3,7 +3,8 @@ import { useCreateProfile } from './use-create-profile';
 import { useUpdateProfile } from './use-update-profile';
 import { useDeleteProfile } from './use-delete-profile';
 import { isApiError } from '@/lib/errors/api-error';
-import type { CreateProfileInput, Profile, UpdateProfileInput } from '../types';
+import type { CreateProfileInput, UpdateProfileInput } from '@/api/vision-browser/types';
+import type { Profile } from '@/types/profile';
 
 export function useProfileDialogs(folderId: string | null) {
     const { createProfile, isCreating } = useCreateProfile(folderId);

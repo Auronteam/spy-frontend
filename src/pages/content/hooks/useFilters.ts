@@ -1,12 +1,6 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { type DateRange } from 'react-day-picker';
-
-export type Filters = {
-    categories: string[];
-    countries: string[];
-    createdAt?: DateRange;
-};
+import type { PostFilters } from '@/api/db/types';
 
 // Calendar hands us Date objects in local time (a click on "Sep 1" is local
 // midnight Sep 1) — read/construct them in local time too, no UTC anywhere.
@@ -32,7 +26,7 @@ function parseListParam(value: string | null): string[] {
 export function useFilters() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const filters = useMemo<Filters>(() => {
+    const filters = useMemo<PostFilters>(() => {
         const from = parseDateParam(searchParams.get('from'));
         const to = parseDateParam(searchParams.get('to'));
         return {
@@ -42,7 +36,7 @@ export function useFilters() {
         };
     }, [searchParams]);
 
-    const setFilter = <K extends keyof Filters>(key: K, value: Filters[K]) => {
+    const setFilter = <K extends keyof PostFilters>(key: K, value: PostFilters[K]) => {
         setSearchParams(
             prev => {
                 const next = new URLSearchParams(prev);
@@ -56,7 +50,7 @@ export function useFilters() {
                 // Only DateRange | undefined is left once the array case is
                 // handled — TS can't narrow a generic K's value type from a
                 // runtime Array.isArray check, so this one cast is real.
-                const range = value as Filters['createdAt'];
+                const range = value as PostFilters['createdAt'];
                 if (range?.from) next.set('from', formatDateParam(range.from));
                 else next.delete('from');
                 if (range?.to) next.set('to', formatDateParam(range.to));

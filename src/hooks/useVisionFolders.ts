@@ -2,11 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchVisionFolders } from '@/api/vision-browser';
 import { queryKeys } from '@/lib/query-keys';
-
-export type VisionFolder = {
-    id: string;
-    name?: string;
-};
+import type { VisionFolder } from '@/types/vision-folder';
 
 // Stable empty-array reference while loading — `?? []` would create a new
 // literal on every render, which could loop the effect below.

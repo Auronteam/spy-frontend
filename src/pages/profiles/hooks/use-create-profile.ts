@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createVisionProfile } from '@/api/vision-browser';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
-import type { CreateProfileInput } from '@/pages/profiles/types';
+import type { CreateProfileInput } from '@/api/vision-browser/types';
 
 export function useCreateProfile(folderId: string | null) {
     const queryClient = useQueryClient();

@@ -1,29 +1,16 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { updateVisionToken } from '@/api/settings';
-import { notifyError } from '@/lib/errors/notify-error';
+import { formatDate } from '@/lib/utils';
+import { useUpdateVisionToken } from './hooks/use-update-vision-token';
 import visionXTokenImg from './assets/vision-x-token.png';
-
-const formatDate = (iso: string): string =>
-    new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
 export const SettingsPage = () => {
     const [token, setToken] = useState('');
 
-    const mutation = useMutation({
-        mutationFn: updateVisionToken,
-        onError: e => notifyError(e),
-    });
-
-    const handleSave = () => {
-        const trimmed = token.trim();
-        if (!trimmed) return;
-        mutation.mutate(trimmed);
-    };
+    const { saveToken, isPending, isSuccess, validUntil } = useUpdateVisionToken();
 
     return (
         <div className="flex flex-col gap-5">
@@ -63,19 +50,18 @@ export const SettingsPage = () => {
                             onChange={e => setToken(e.target.value)}
                             placeholder="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9…"
                             className="font-mono text-xs"
-                            disabled={mutation.isPending}
+                            disabled={isPending}
                         />
                     </div>
-                    <Button onClick={handleSave} disabled={!token.trim() || mutation.isPending}>
-                        {mutation.isPending ? 'Saving...' : 'Save token'}
+                    <Button onClick={() => saveToken(token)} disabled={!token.trim() || isPending}>
+                        {isPending ? 'Saving...' : 'Save token'}
                     </Button>
                 </div>
 
-                {mutation.isSuccess && (
+                {isSuccess && (
                     <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-[12.5px] text-green-700">
                         Token saved.
-                        {mutation.data.validUntil &&
-                            ` Valid until ${formatDate(mutation.data.validUntil)}.`}
+                        {validUntil && ` Valid until ${formatDate(new Date(validUntil))}.`}
                     </div>
                 )}
             </Card>

@@ -2,7 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { formatDateTime, formatFileSize } from '@/lib/utils';
-import type { LogFile } from '@/pages/logs/types';
+import type { LogFile } from '@/api/logs/types';
 
 interface LogFilesListProps {
     files: LogFile[];

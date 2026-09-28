@@ -3,7 +3,7 @@ import { skipToken, useQuery } from '@tanstack/react-query';
 import { fetchProfileLogContent, fetchProfileLogFiles } from '@/api/logs';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
-import type { LogFile } from '../types';
+import type { LogFile } from '@/api/logs/types';
 
 const CONTENT_LINES = '1000';
 const CONTENT_TAIL = true;
