@@ -175,8 +175,6 @@ AI assists but does not make architectural or business decisions.
   - read from or write to external state (localStorage, cookies, environment variables),
   - cause side effects.
 
-Note: these constraints apply to `apps/web` services. `apps/backend` does not have React/DOM concerns, but the same purity/single-responsibility spirit applies to its `services/` layer — see the `monorepo-standards` skill for backend-specific layering rules.
-
 ## Function Definition
 - Services MUST export named functions using `export function`.
 - Arrow functions are not allowed in services.
