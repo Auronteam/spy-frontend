@@ -6,7 +6,8 @@ export const queryKeys = {
         ready: (profileId: string) => ['vision', 'ready', profileId] as const,
     },
     scanner: {
-        status: (profileId: string) => ['scanner', 'status', profileId] as const,
+        all: () => ['scanner'] as const,
+        status: (profileId: string) => [...queryKeys.scanner.all(), 'status', profileId] as const,
     },
     posts: {
         list: <TFilters>(page: number, pageSize: number, filters: TFilters) =>

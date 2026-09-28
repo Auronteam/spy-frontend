@@ -41,7 +41,8 @@ export const ProfilesPage = () => {
         refreshActiveProfiles,
         isVisionActive,
     } = useActiveProfiles(folderId);
-    const { isScannerRunning, isScannerPaused, pauseMsLeft } = useScannerStatus(profiles);
+    const { isScannerRunning, isScannerPaused, pauseMsLeft, refreshScannerStatuses } =
+        useScannerStatus(profiles);
     const { isVisionReady } = useVisionReady(profiles, isVisionActive);
     const { addDialog, editDialog, deleteDialog, openAddDialog, openEditDialog, openDeleteDialog } =
         useProfileDialogs(folderId);
@@ -70,6 +71,7 @@ export const ProfilesPage = () => {
     const handleRefresh = () => {
         refetchProfiles();
         refreshActiveProfiles();
+        refreshScannerStatuses();
     };
 
     return (

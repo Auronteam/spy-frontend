@@ -1,4 +1,4 @@
-import { useQueries } from '@tanstack/react-query';
+import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { fetchScannerStatus } from '@/api/scanner';
 import type { ScannerStatus } from '@/api/scanner';
 import type { Profile } from '@/pages/profiles/types';
@@ -11,6 +11,7 @@ const SCANNER_POLL_INTERVAL_MS = 15000;
 // whether it was already running before this page loaded), and polling
 // self-stops once running:false comes back (function-form refetchInterval).
 export const useScannerStatus = (profiles: Profile[]) => {
+    const queryClient = useQueryClient();
     const queries = useQueries({
         queries: profiles.map(profile => ({
             queryKey: queryKeys.scanner.status(profile.id),
@@ -35,9 +36,13 @@ export const useScannerStatus = (profiles: Profile[]) => {
         return Math.max(0, t - Date.now());
     };
 
+    const refreshScannerStatuses = () =>
+        queryClient.invalidateQueries({ queryKey: queryKeys.scanner.all() });
+
     return {
         isScannerRunning,
         isScannerPaused,
         pauseMsLeft,
+        refreshScannerStatuses,
     };
 };
