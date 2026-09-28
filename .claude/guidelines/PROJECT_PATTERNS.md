@@ -21,6 +21,11 @@ commit messages, and any committed docs/markdown (`docs/*.md` included). No
 Russian, even in something that starts as a scratch note if it ends up
 committed. This is about what lands in the repo, not the chat with the user.
 
+**Exception:** the user-facing FAQ page content (`src/pages/faq/faq-page-data.ts`
+and the FAQ page subtitle) is written in Ukrainian on purpose — it's the one
+place addressed to the team in their language. Identifiers and everything
+else in that feature stay English.
+
 Communication with the user is the opposite: every report, plan, summary,
 question, and answer in the chat MUST be written in Russian, always.
 
@@ -55,7 +60,7 @@ state/effects, services/api do data logic), applied here as:
 
 ```
 src/
-├── pages/<feature>/          # one folder per route: profiles, content, logs, categories, settings, login
+├── pages/<feature>/          # one folder per route: profiles, content, logs, categories, settings, faq, login
 │   ├── <feature>-page.tsx    # route target — the only file imported by router.tsx
 │   ├── components/           # feature-local components
 │   ├── hooks/                # feature-local hooks (TanStack Query lives here)
@@ -120,6 +125,7 @@ export const ROUTES = {
     logs: '/logs',
     categories: '/categories',
     settings: '/settings',
+    faq: '/faq',
 } as const;
 ```
 
@@ -131,8 +137,8 @@ client-side:
   `/profiles` (admin) or `/content` (user); otherwise renders the route.
 - **`ProtectedRoute`** — wraps everything else. Redirects to `/login` if
   unauthenticated. Takes an optional `allowedRoles` prop for role-gating; the
-  router nests it twice — once bare (any authenticated user, currently just
-  `/content`) and once with `allowedRoles={['admin']}` around
+  router nests it twice — once bare (any authenticated user, currently
+  `/content` and `/faq`) and once with `allowedRoles={['admin']}` around
   `/profiles`, `/logs`, `/categories`, `/settings`.
 - **`DashboardLayout`** — the shared chrome (`TopNav` + `<Outlet/>`) for every
   authenticated route.

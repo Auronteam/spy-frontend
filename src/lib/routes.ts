@@ -7,6 +7,7 @@ export const ROUTES = {
     logs: '/logs',
     categories: '/categories',
     settings: '/settings',
+    faq: '/faq',
 } as const;
 
 // Admin lands on Profiles, everyone else on Content — the one place this

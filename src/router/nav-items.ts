@@ -49,4 +49,9 @@ export const NAV_ITEMS: NavItem[] = [
             import('@/pages/settings/settings-page').then(m => ({ Component: m.SettingsPage })),
         allowedRoles: ['admin'],
     },
+    {
+        path: ROUTES.faq,
+        label: 'FAQ',
+        lazy: () => import('@/pages/faq/faq-page').then(m => ({ Component: m.FaqPage })),
+    },
 ];

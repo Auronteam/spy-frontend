@@ -53,6 +53,12 @@ pnpm dev
   `src/pages/profiles/components/proxy-info.tsx`; flag/name helpers:
   `src/lib/country.ts`.
 
+- **FAQ** (`/faq`, every signed-in user) — a short in-app guide, in
+  Ukrainian, to what the app is for and how to run a scan: X-Token first,
+  profiles only via Add profile, Connect → Start scanner, sessions and
+  pauses, Content, Categories and Logs. Text lives in
+  `src/pages/faq/faq-page-data.ts`.
+
 ## Status
 
 Past the initial scaffold (Phase 1) — routing, auth, and the core pages
