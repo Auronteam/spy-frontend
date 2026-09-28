@@ -71,7 +71,7 @@ src/
 ├── components/errors/         # PageError, QueryPageGuard
 ├── hooks/                     # shared, cross-feature hooks — same "2+ features" rule as components/
 ├── contexts/                  # React Context providers (auth-context.tsx)
-├── router/                    # createBrowserRouter config, ProtectedRoute/GuestRoute, DashboardLayout
+├── router/                    # createBrowserRouter config, ProtectedRoute/GuestRoute, DashboardLayout, session-verify error screen
 ├── providers/                  # app-level providers mounted once in App.tsx (QueryProvider, SentryInit)
 ├── types/                     # shared domain types used by 2+ features (profile.ts, auth.ts, ...)
 ├── lib/                       # framework-agnostic utilities
@@ -85,16 +85,18 @@ src/
 
 **File naming:** kebab-case for every filename, components included
 (`stat-card.tsx`, `log-files-list.tsx`) — matches the `spy` monorepo's own
-rule. **Known gap:** the hooks under `pages/profiles/hooks/` and
-`pages/content/hooks/` are still camelCase (`useProfileActions.ts` etc.) —
+rule. **Known gap:** some hooks under `pages/profiles/hooks/`,
+`pages/content/hooks/` and `src/hooks/` are still camelCase
+(`useScannerActions.ts`, `useVisionFolders.ts` etc.) —
 inherited as-is from the Next.js migration. Don't copy that pattern into new
 files (new hooks are kebab-case, e.g. `use-log-stream.ts`); renaming the old
 ones is a separate cleanup, not something to do incidentally while touching
 unrelated code.
 
 Component/props/hook rules (arrow functions, named exports, `<ComponentName>Props`,
-150-line guidance, etc.) are the general `AI_GUIDELINES.md` rules — nothing
-project-specific to add there.
+150-line guidance, etc.) are the general `AI_GUIDELINES.md` rules. The one
+project-specific addition: hooks are declared with `export function` and an
+explicit result `type` (e.g. `UseScannerActionsResult`).
 
 **Docs vs. audit notes:** `docs/` is for human-readable project
 documentation, committed to git. Audit findings, followups, and other
@@ -144,8 +146,12 @@ Guards and `DashboardLayout` stay eager; the top-level routes set
 `HydrateFallback: FullScreenSpinner` for the initial chunk load.
 
 Both guards read auth state from `useAuth()` (`src/contexts/auth-context.tsx`)
-and render nothing but a `<Spinner/>` while the initial cookie-verify request
-is in flight (`isLoading`).
+and render `FullScreenSpinner` while the initial cookie-verify request is in
+flight (`isLoading`). The stored token is cleared only when `/auth/verify`
+answers 401 (the backend's response for every invalid-token case); any other
+failure (5xx, network error, timeout) keeps the token and sets `verifyError`,
+and both guards then render `SessionVerifyError` (`src/router/`) with a Retry
+that re-runs the verification via `retry()` from the context.
 
 ---
 
@@ -244,9 +250,17 @@ itself, not caught by `isApiError`) is reported to Sentry via `captureError`.
   `queryKeys.logs.content(profileId, file)`, ...), grouped by resource. Don't
   reintroduce inline array keys at a call site; add a new entry to the
   factory instead, following the existing per-resource shape.
+- **`mutationKeys` factory** (same file) — per-profile keys for the scanner
+  and Vision run/stop mutations. Their pending flags are read from the
+  mutation cache (`useIsMutating({ mutationKey }) > 0`) rather than the
+  mutation's own `isPending`, so a table row that remounts mid-action (paging,
+  search) still shows it as in progress. `onSuccess` handlers return the
+  invalidation promise so the mutation stays pending until dependent queries
+  have refetched.
 - **`skipToken` for conditionally-disabled queries**, not `enabled: false` +
   a non-null assertion on the query param — e.g. `useVisionProfiles`,
-  `useProfileLogFiles`. This is the established style here; keep using it
+  `useProfileLogFiles`, `useSelectedProfileScanner`. Use `null` as the single
+  "nothing selected" value for such params. This is the established style here; keep using it
   for any new query that depends on a value that might not exist yet.
 
 ---
