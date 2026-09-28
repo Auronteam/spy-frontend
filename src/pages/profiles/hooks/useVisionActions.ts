@@ -15,6 +15,7 @@ export function useVisionActions(profileId: string, folderId: string | null) {
     const runVisionMutation = useMutation({
         mutationFn: () => runVisionProfile(profileId, folderId ?? undefined),
         onSuccess: () => {
+            queryClient.removeQueries({ queryKey: queryKeys.vision.ready(profileId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
         onError: e => notifyError(e),
@@ -29,6 +30,7 @@ export function useVisionActions(profileId: string, folderId: string | null) {
             await stopVisionProfileOnServer(profileId, folderId!);
         },
         onSuccess: () => {
+            queryClient.removeQueries({ queryKey: queryKeys.vision.ready(profileId) });
             queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
         onError: e => {

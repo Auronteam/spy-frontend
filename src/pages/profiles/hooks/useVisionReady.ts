@@ -24,6 +24,7 @@ export function useVisionReady(
             queryKey: queryKeys.vision.ready(profile.id),
             queryFn: () => fetchVisionReady(profile.id),
             enabled: isVisionActive(profile.id),
+            staleTime: 0,
             refetchInterval: (query: { state: { data?: { ready: boolean } } }) =>
                 query.state.data?.ready ? false : READY_POLL_INTERVAL_MS,
         })),
