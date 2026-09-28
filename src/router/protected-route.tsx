@@ -3,13 +3,14 @@ import { useAuth } from '@/contexts/auth-context';
 import { ROUTES } from '@/lib/routes';
 import type { UserRole } from '@/types/auth';
 import { Spinner } from '@/components/ui/spinner';
+import { SessionVerifyError } from '@/router/session-verify-error';
 
 interface ProtectedRouteProps {
     allowedRoles?: UserRole[];
 }
 
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
-    const { user, isLoading } = useAuth();
+    const { user, isLoading, verifyError, retry } = useAuth();
 
     if (isLoading) {
         return (
@@ -17,6 +18,10 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
                 <Spinner />
             </div>
         );
+    }
+
+    if (verifyError) {
+        return <SessionVerifyError description={verifyError} onRetry={retry} />;
     }
 
     if (!user) {

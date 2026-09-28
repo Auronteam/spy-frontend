@@ -7,6 +7,8 @@ import { isApiError } from '@/lib/errors/api-error';
 interface AuthContextType {
     user: AuthUser | null;
     isLoading: boolean;
+    verifyError: string | null;
+    retry: () => void;
     login: (token: string, user: AuthUser) => void;
     logout: () => void;
 }
@@ -20,6 +22,8 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [verifyError, setVerifyError] = useState<string | null>(null);
+    const [verifyAttempt, setVerifyAttempt] = useState(0);
 
     useEffect(() => {
         const token = getClientAuthToken();
@@ -35,7 +39,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             })
             .catch((err: unknown) => {
                 if (cancelled) return;
-                if (isApiError(err) && err.status !== undefined) clearClientAuthToken();
+                if (isApiError(err) && err.status === 401) {
+                    clearClientAuthToken();
+                    return;
+                }
+                setVerifyError(isApiError(err) ? err.message : 'Could not verify your session');
             })
             .finally(() => {
                 if (!cancelled) setIsLoading(false);
@@ -44,10 +52,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return () => {
             cancelled = true;
         };
-    }, []);
+    }, [verifyAttempt]);
+
+    const retry = () => {
+        setIsLoading(true);
+        setVerifyError(null);
+        setVerifyAttempt(attempt => attempt + 1);
+    };
 
     const login = (token: string, user: AuthUser) => {
         setClientAuthToken(token);
+        setVerifyError(null);
         setUser(user);
     };
 
@@ -58,7 +73,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+        <AuthContext.Provider value={{ user, isLoading, verifyError, retry, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
