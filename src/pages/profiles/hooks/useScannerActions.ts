@@ -4,7 +4,7 @@ import { runScanner as runScannerApi } from '@/api/scanner';
 import { notifyError } from '@/lib/errors/notify-error';
 import { isApiError } from '@/lib/errors/api-error';
 import { queryKeys } from '@/lib/query-keys';
-import { stopScannerAndWait } from './scanner-stop';
+import { ScannerStopTimeoutError, stopScannerAndWait } from './scanner-stop';
 
 export function useScannerActions(profileId: string, folderId: string | null) {
     const queryClient = useQueryClient();
@@ -26,6 +26,11 @@ export function useScannerActions(profileId: string, folderId: string | null) {
             queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
         onError: e => {
+            if (e instanceof ScannerStopTimeoutError) {
+                toast.error(e.message);
+                return;
+            }
+
             const errorMessage = isApiError(e) ? e.message : 'Failed to stop scanner';
 
             if (errorMessage.includes('Failed to stop Vision profile')) {

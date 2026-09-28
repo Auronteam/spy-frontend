@@ -32,7 +32,7 @@ export const ProfileTableRow = ({
     onEdit,
     onDelete,
 }: ProfileTableRowProps) => {
-    const vision = useVisionActions(profile.id, folderId, scannerRunning);
+    const vision = useVisionActions(profile.id, folderId);
     const scanner = useScannerActions(profile.id, folderId);
 
     const visionState = {

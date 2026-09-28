@@ -3,13 +3,13 @@ import { toast } from 'sonner';
 import { runVisionProfile, stopVisionProfileOnServer } from '@/api/vision-browser';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
-import { stopScannerAndWait } from './scanner-stop';
+import {
+    fetchFreshScannerStatus,
+    ScannerStopTimeoutError,
+    stopScannerAndWait,
+} from './scanner-stop';
 
-export function useVisionActions(
-    profileId: string,
-    folderId: string | null,
-    scannerRunning: boolean
-) {
+export function useVisionActions(profileId: string, folderId: string | null) {
     const queryClient = useQueryClient();
 
     const runVisionMutation = useMutation({
@@ -22,7 +22,8 @@ export function useVisionActions(
 
     const stopVisionMutation = useMutation({
         mutationFn: async () => {
-            if (scannerRunning) {
+            const scannerStatus = await fetchFreshScannerStatus(queryClient, profileId);
+            if (scannerStatus.running) {
                 await stopScannerAndWait(queryClient, profileId);
             }
             await stopVisionProfileOnServer(profileId, folderId!);
@@ -30,7 +31,13 @@ export function useVisionActions(
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
-        onError: e => notifyError(e),
+        onError: e => {
+            if (e instanceof ScannerStopTimeoutError) {
+                toast.error(e.message);
+                return;
+            }
+            notifyError(e);
+        },
     });
 
     const stopVision = () => {
