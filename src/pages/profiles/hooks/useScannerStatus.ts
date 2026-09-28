@@ -5,11 +5,12 @@ import type { Profile } from '@/pages/profiles/types';
 import { queryKeys } from '@/lib/query-keys';
 
 const SCANNER_POLL_INTERVAL_MS = 15000;
+const SCANNER_IDLE_POLL_INTERVAL_MS = 30000;
 
 // One query per profile via useQueries — same pattern as useVisionReady.
 // Every profile is queried regardless of who started its scanner (or
-// whether it was already running before this page loaded), and polling
-// self-stops once running:false comes back (function-form refetchInterval).
+// whether it was already running before this page loaded). Running scanners
+// poll faster than stopped ones (function-form refetchInterval).
 export const useScannerStatus = (profiles: Profile[]) => {
     const queryClient = useQueryClient();
     const queries = useQueries({
@@ -17,7 +18,9 @@ export const useScannerStatus = (profiles: Profile[]) => {
             queryKey: queryKeys.scanner.status(profile.id),
             queryFn: () => fetchScannerStatus(profile.id),
             refetchInterval: (query: { state: { data?: ScannerStatus } }) =>
-                query.state.data?.running ? SCANNER_POLL_INTERVAL_MS : false,
+                query.state.data?.running
+                    ? SCANNER_POLL_INTERVAL_MS
+                    : SCANNER_IDLE_POLL_INTERVAL_MS,
         })),
     });
 
