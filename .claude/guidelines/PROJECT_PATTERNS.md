@@ -21,6 +21,11 @@ commit messages, and any committed docs/markdown (`docs/*.md` included). No
 Russian, even in something that starts as a scratch note if it ends up
 committed. This is about what lands in the repo, not the chat with the user.
 
+**Exception:** the user-facing FAQ page content (`src/pages/faq/faq-page-data.ts`
+and the FAQ page subtitle) is written in Ukrainian on purpose — it's the one
+place addressed to the team in their language. Identifiers and everything
+else in that feature stay English.
+
 Communication with the user is the opposite: every report, plan, summary,
 question, and answer in the chat MUST be written in Russian, always.
 
@@ -55,7 +60,7 @@ state/effects, services/api do data logic), applied here as:
 
 ```
 src/
-├── pages/<feature>/          # one folder per route: profiles, content, logs, categories, settings, login
+├── pages/<feature>/          # one folder per route: profiles, content, logs, categories, settings, faq, login
 │   ├── <feature>-page.tsx    # route target — the only file imported by router.tsx
 │   ├── components/           # feature-local components
 │   ├── hooks/                # feature-local hooks (TanStack Query lives here)
@@ -71,7 +76,7 @@ src/
 ├── components/errors/         # PageError, QueryPageGuard
 ├── hooks/                     # shared, cross-feature hooks — same "2+ features" rule as components/
 ├── contexts/                  # React Context providers (auth-context.tsx)
-├── router/                    # createBrowserRouter config, ProtectedRoute/GuestRoute, DashboardLayout
+├── router/                    # createBrowserRouter config, ProtectedRoute/GuestRoute, DashboardLayout, session-verify error screen
 ├── providers/                  # app-level providers mounted once in App.tsx (QueryProvider, SentryInit)
 ├── types/                     # shared domain types used by 2+ features (profile.ts, auth.ts, ...)
 ├── lib/                       # framework-agnostic utilities
@@ -85,16 +90,18 @@ src/
 
 **File naming:** kebab-case for every filename, components included
 (`stat-card.tsx`, `log-files-list.tsx`) — matches the `spy` monorepo's own
-rule. **Known gap:** the hooks under `pages/profiles/hooks/` and
-`pages/content/hooks/` are still camelCase (`useProfileActions.ts` etc.) —
+rule. **Known gap:** some hooks under `pages/profiles/hooks/`,
+`pages/content/hooks/` and `src/hooks/` are still camelCase
+(`useScannerActions.ts`, `useVisionFolders.ts` etc.) —
 inherited as-is from the Next.js migration. Don't copy that pattern into new
 files (new hooks are kebab-case, e.g. `use-log-stream.ts`); renaming the old
 ones is a separate cleanup, not something to do incidentally while touching
 unrelated code.
 
 Component/props/hook rules (arrow functions, named exports, `<ComponentName>Props`,
-150-line guidance, etc.) are the general `AI_GUIDELINES.md` rules — nothing
-project-specific to add there.
+150-line guidance, etc.) are the general `AI_GUIDELINES.md` rules. The one
+project-specific addition: hooks are declared with `export function` and an
+explicit result `type` (e.g. `UseScannerActionsResult`).
 
 **Docs vs. audit notes:** `docs/` is for human-readable project
 documentation, committed to git. Audit findings, followups, and other
@@ -118,6 +125,7 @@ export const ROUTES = {
     logs: '/logs',
     categories: '/categories',
     settings: '/settings',
+    faq: '/faq',
 } as const;
 ```
 
@@ -129,8 +137,8 @@ client-side:
   `/profiles` (admin) or `/content` (user); otherwise renders the route.
 - **`ProtectedRoute`** — wraps everything else. Redirects to `/login` if
   unauthenticated. Takes an optional `allowedRoles` prop for role-gating; the
-  router nests it twice — once bare (any authenticated user, currently just
-  `/content`) and once with `allowedRoles={['admin']}` around
+  router nests it twice — once bare (any authenticated user, currently
+  `/content` and `/faq`) and once with `allowedRoles={['admin']}` around
   `/profiles`, `/logs`, `/categories`, `/settings`.
 - **`DashboardLayout`** — the shared chrome (`TopNav` + `<Outlet/>`) for every
   authenticated route.
@@ -144,8 +152,12 @@ Guards and `DashboardLayout` stay eager; the top-level routes set
 `HydrateFallback: FullScreenSpinner` for the initial chunk load.
 
 Both guards read auth state from `useAuth()` (`src/contexts/auth-context.tsx`)
-and render nothing but a `<Spinner/>` while the initial cookie-verify request
-is in flight (`isLoading`).
+and render `FullScreenSpinner` while the initial cookie-verify request is in
+flight (`isLoading`). The stored token is cleared only when `/auth/verify`
+answers 401 (the backend's response for every invalid-token case); any other
+failure (5xx, network error, timeout) keeps the token and sets `verifyError`,
+and both guards then render `SessionVerifyError` (`src/router/`) with a Retry
+that re-runs the verification via `retry()` from the context.
 
 ---
 
@@ -244,9 +256,17 @@ itself, not caught by `isApiError`) is reported to Sentry via `captureError`.
   `queryKeys.logs.content(profileId, file)`, ...), grouped by resource. Don't
   reintroduce inline array keys at a call site; add a new entry to the
   factory instead, following the existing per-resource shape.
+- **`mutationKeys` factory** (same file) — per-profile keys for the scanner
+  and Vision run/stop mutations. Their pending flags are read from the
+  mutation cache (`useIsMutating({ mutationKey }) > 0`) rather than the
+  mutation's own `isPending`, so a table row that remounts mid-action (paging,
+  search) still shows it as in progress. `onSuccess` handlers return the
+  invalidation promise so the mutation stays pending until dependent queries
+  have refetched.
 - **`skipToken` for conditionally-disabled queries**, not `enabled: false` +
   a non-null assertion on the query param — e.g. `useVisionProfiles`,
-  `useProfileLogFiles`. This is the established style here; keep using it
+  `useProfileLogFiles`, `useSelectedProfileScanner`. Use `null` as the single
+  "nothing selected" value for such params. This is the established style here; keep using it
   for any new query that depends on a value that might not exist yet.
 
 ---

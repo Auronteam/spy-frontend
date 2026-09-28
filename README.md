@@ -10,7 +10,7 @@ pushed to directly.
 ## Stack
 
 - Vite, React 19, TypeScript (strict)
-- `react-router-dom` for routing
+- `react-router-dom` v7 for routing (page routes are lazy-loaded)
 - `@tanstack/react-query` for server state
 - shadcn/ui (style "new-york", baseColor "zinc" — see `src/index.css`)
 - `@sentry/react`, `sonner` for error tracking / toasts
@@ -27,6 +27,7 @@ pnpm dev
 
 - `pnpm dev` — dev server
 - `pnpm build` — typecheck + production build
+- `pnpm preview` — serve the production build locally
 - `pnpm typecheck` — typecheck only
 - `pnpm lint` / `pnpm lint:fix`
 - `pnpm format` / `pnpm format:check`
@@ -52,8 +53,15 @@ pnpm dev
   `src/pages/profiles/components/proxy-info.tsx`; flag/name helpers:
   `src/lib/country.ts`.
 
+- **FAQ** (`/faq`, every signed-in user) — a short in-app guide, in
+  Ukrainian, to what the app is for and how to run a scan: X-Token first,
+  profiles only via Add profile, Connect → Start scanner, sessions and
+  pauses, Content, Categories and Logs. Text lives in
+  `src/pages/faq/faq-page-data.ts`.
+
 ## Status
 
 Past the initial scaffold (Phase 1) — routing, auth, and the core pages
-(Profiles, Content, Logs, Categories, Settings stub) are built and in use.
+(Profiles, Content, Logs, Categories, Settings with the Vision X-Token form)
+are built and in use.
 See the `spy` repo's migration plan for what's still outstanding.
