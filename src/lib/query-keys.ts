@@ -10,8 +10,9 @@ export const queryKeys = {
         status: (profileId: string) => [...queryKeys.scanner.all(), 'status', profileId] as const,
     },
     posts: {
+        all: () => ['posts'] as const,
         list: <TFilters>(page: number, pageSize: number, filters: TFilters) =>
-            ['posts', page, pageSize, filters] as const,
+            [...queryKeys.posts.all(), page, pageSize, filters] as const,
     },
     categories: {
         all: () => ['categories'] as const,
