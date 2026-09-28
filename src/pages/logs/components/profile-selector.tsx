@@ -24,7 +24,12 @@ export const ProfileSelector = ({
     return (
         <div className="flex flex-wrap items-center gap-3">
             {folders.length > 1 && (
-                <Select value={folderId ?? ''} onValueChange={onFolderChange} className="max-w-xs">
+                <Select
+                    value={folderId ?? ''}
+                    onValueChange={onFolderChange}
+                    className="max-w-xs"
+                    aria-label="Folder"
+                >
                     {folders.map(folder => (
                         <SelectItem key={folder.id} value={folder.id}>
                             {folder.name ?? folder.id}
@@ -37,6 +42,7 @@ export const ProfileSelector = ({
                 value={selectedProfileId ?? ''}
                 onValueChange={onProfileChange}
                 className="max-w-xs"
+                aria-label="Profile"
                 disabled={profilesLoading || profiles.length === 0}
             >
                 <SelectItem value="">

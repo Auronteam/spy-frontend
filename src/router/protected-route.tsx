@@ -2,7 +2,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { ROUTES } from '@/lib/routes';
 import type { UserRole } from '@/types/auth';
-import { Spinner } from '@/components/ui/spinner';
+import { FullScreenSpinner } from '@/router/full-screen-spinner';
 import { SessionVerifyError } from '@/router/session-verify-error';
 
 interface ProtectedRouteProps {
@@ -13,11 +13,7 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     const { user, isLoading, verifyError, retry } = useAuth();
 
     if (isLoading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <Spinner />
-            </div>
-        );
+        return <FullScreenSpinner />;
     }
 
     if (verifyError) {

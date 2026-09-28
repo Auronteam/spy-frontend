@@ -7,6 +7,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
+import { cn } from '@/lib/utils';
 import type { PaginationRangeItem } from '@/pages/content/types';
 
 interface ContentPaginationProps {
@@ -24,17 +25,17 @@ export const ContentPagination = ({
     canNext,
     pagesRange,
     goToPage,
-    className = '',
+    className,
 }: ContentPaginationProps) => {
     return (
-        <div className={`mb-3 ${className}`}>
+        <div className={cn('mb-3', className)}>
             <UIPagination>
                 <PaginationContent>
                     <PaginationItem>
                         <PaginationPrevious
                             href="#"
                             aria-disabled={!canPrev}
-                            className={!canPrev ? 'pointer-events-none opacity-50' : ''}
+                            className={cn(!canPrev && 'pointer-events-none opacity-50')}
                             onClick={e => {
                                 e.preventDefault();
                                 if (canPrev) goToPage(page - 1);
@@ -65,7 +66,7 @@ export const ContentPagination = ({
                         <PaginationNext
                             href="#"
                             aria-disabled={!canNext}
-                            className={!canNext ? 'pointer-events-none opacity-50' : ''}
+                            className={cn(!canNext && 'pointer-events-none opacity-50')}
                             onClick={e => {
                                 e.preventDefault();
                                 if (canNext) goToPage(page + 1);

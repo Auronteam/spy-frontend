@@ -69,7 +69,12 @@ export const ProfilesPage = () => {
             </div>
 
             {folders.length > 1 && (
-                <Select value={folderId ?? ''} onValueChange={setFolderId} className="max-w-xs">
+                <Select
+                    aria-label="Folder"
+                    value={folderId ?? ''}
+                    onValueChange={setFolderId}
+                    className="max-w-xs"
+                >
                     {folders.map(folder => (
                         <SelectItem key={folder.id} value={folder.id}>
                             {folder.name ?? folder.id}

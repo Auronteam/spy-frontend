@@ -12,6 +12,7 @@ type UseProfilesTableResult = {
     currentPage: number;
     totalPages: number;
     summary: string;
+    emptyMessage: string;
     goPrev: () => void;
     goNext: () => void;
 };
@@ -41,6 +42,12 @@ export function useProfilesTable(profiles: Profile[]): UseProfilesTableResult {
         profiles.length
     );
 
+    const trimmedSearch = search.trim();
+    const emptyMessage =
+        trimmedSearch && profiles.length > 0
+            ? `No profiles match "${trimmedSearch}"`
+            : 'No profiles';
+
     const setSearch = (value: string) => {
         setSearchState(value);
         setPage(1);
@@ -57,6 +64,7 @@ export function useProfilesTable(profiles: Profile[]): UseProfilesTableResult {
         currentPage,
         totalPages,
         summary,
+        emptyMessage,
         goPrev,
         goNext,
     };

@@ -20,17 +20,19 @@ export const ProfileActionButton = ({
 }: ProfileActionButtonProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
-            <span className={cn('inline-flex', locked && 'cursor-not-allowed')}>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={locked}
-                    onClick={onClick}
-                    aria-label={label}
-                >
-                    {icon}
-                </Button>
-            </span>
+            <Button
+                variant="ghost"
+                size="sm"
+                aria-disabled={locked}
+                onClick={locked ? undefined : onClick}
+                aria-label={label}
+                className={cn(
+                    locked &&
+                        'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-inherit'
+                )}
+            >
+                {icon}
+            </Button>
         </TooltipTrigger>
         <TooltipContent>{locked ? lockedHint : label}</TooltipContent>
     </Tooltip>

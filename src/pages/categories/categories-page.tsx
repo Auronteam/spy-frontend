@@ -17,6 +17,7 @@ export const CategoriesPage = () => {
         isLoading,
         isError,
         error,
+        refetch,
         createCategory,
         isCreating,
         updateCategory,
@@ -58,6 +59,7 @@ export const CategoriesPage = () => {
                 }
                 isError={isError}
                 error={error}
+                onRetry={refetch}
                 title="Failed to load categories"
             >
                 <Card className="divide-y p-0">

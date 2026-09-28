@@ -25,6 +25,7 @@ export type UseCategoriesResult = {
     isLoading: boolean;
     isError: boolean;
     error: Error | null;
+    refetch: () => void;
     createCategory: UseMutateFunction<Category, Error, CreateCategoryInput>;
     isCreating: boolean;
     updateCategory: UseMutateFunction<Category, Error, UpdateCategoryInput>;
@@ -68,6 +69,7 @@ export function useCategories(): UseCategoriesResult {
         isLoading: query.isLoading,
         isError: query.isError,
         error: query.error,
+        refetch: query.refetch,
         createCategory: createMutation.mutate,
         isCreating: createMutation.isPending,
         updateCategory: updateMutation.mutate,

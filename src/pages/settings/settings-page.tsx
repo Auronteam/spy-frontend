@@ -23,10 +23,10 @@ export const SettingsPage = () => {
 
             <Card className="flex flex-col gap-4 p-5">
                 <div>
-                    <h2 className="text-[15px] font-semibold tracking-tight">
+                    <h2 className="text-base font-semibold tracking-tight">
                         Vision Browser X-Token
                     </h2>
-                    <p className="mt-1.5 max-w-[680px] text-sm leading-relaxed text-muted-foreground">
+                    <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                         Once a month, and every time you sign in, you need to refresh the X-Token of
                         your Vision Browser. Open Vision Browser settings, find{' '}
                         <strong className="font-semibold text-foreground">X-Token</strong> in the{' '}
@@ -38,11 +38,14 @@ export const SettingsPage = () => {
                 <img
                     src={visionXTokenImg}
                     alt="Vision Browser settings — X-Token field in the Additional block"
+                    width={1292}
+                    height={932}
+                    loading="lazy"
                     className="w-full rounded-md border"
                 />
 
                 <div className="flex flex-wrap items-end gap-2.5">
-                    <div className="flex min-w-[260px] flex-1 flex-col gap-1.5">
+                    <div className="flex min-w-64 flex-1 flex-col gap-1.5">
                         <Label htmlFor="xtoken">X-Token</Label>
                         <Input
                             id="xtoken"
@@ -59,7 +62,10 @@ export const SettingsPage = () => {
                 </div>
 
                 {isSuccess && (
-                    <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-[12.5px] text-green-700">
+                    <div
+                        role="status"
+                        className="rounded-md border border-success-border bg-success-muted px-3 py-2 text-xs text-success-strong"
+                    >
                         Token saved.
                         {validUntil && ` Valid until ${formatDate(new Date(validUntil))}.`}
                     </div>

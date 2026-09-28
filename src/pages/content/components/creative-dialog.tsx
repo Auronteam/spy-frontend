@@ -1,9 +1,16 @@
 import { useMemo } from 'react';
 import { Check, Copy } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getFlagEmoji } from '@/lib/country';
+import { cn } from '@/lib/utils';
 import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
 import { getDriveFileSrc } from '@/api/google';
 import { formatIsoToDMY, getDriveFolderUrl } from '../utils';
@@ -44,7 +51,7 @@ const CreativeLinkRow = ({ label, url, copyKey, copiedKey, onCopy }: CreativeLin
             aria-label={`Copy ${label} link`}
         >
             {copiedKey === copyKey ? (
-                <Check className="h-3.5 w-3.5 text-green-600" />
+                <Check className="h-3.5 w-3.5 text-success" />
             ) : (
                 <Copy className="h-3.5 w-3.5" />
             )}
@@ -68,25 +75,25 @@ export const CreativeDialog = ({ open, onOpenChange, post }: CreativeDialogProps
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-[92vw] sm:max-w-4xl">
+            <DialogContent className="max-w-dialog sm:max-w-4xl">
                 {post && (
                     <>
                         <DialogHeader className="mb-2">
-                            <DialogTitle className="flex items-center gap-2 text-lg">
+                            <div className="flex items-center gap-2">
                                 <Badge variant="secondary">{post.category.title}</Badge>
-                                <span className="flex items-center gap-1.5 font-mono text-sm text-muted-foreground">
+                                <DialogTitle className="flex items-center gap-1.5 font-mono text-sm text-muted-foreground">
                                     <span className="text-base leading-none">
                                         {getFlagEmoji(post.geo)}
                                     </span>
                                     {post.geo}
-                                </span>
-                            </DialogTitle>
-                            {dateText && (
-                                <p className="mt-0.5 text-sm text-muted-foreground">{dateText}</p>
-                            )}
+                                </DialogTitle>
+                            </div>
+                            <DialogDescription className={cn('mt-0.5', !dateText && 'sr-only')}>
+                                {dateText || `${post.category.title} creative from ${post.geo}`}
+                            </DialogDescription>
                         </DialogHeader>
 
-                        <div className="grid grid-cols-1 gap-5 md:h-[60vh] md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-5 md:h-dialog md:grid-cols-2">
                             <CreativeMediaPreview
                                 videoKey={post.creativeVideoUrl ?? post.hash}
                                 hasVideo={hasVideo}

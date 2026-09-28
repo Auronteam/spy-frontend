@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { fetchScannerStatus } from '@/api/scanner';
 import type { ScannerStatus } from '@/api/scanner';
@@ -31,10 +32,16 @@ export function useScannerStatus(profiles: Profile[]): UseScannerStatusResult {
         })),
     });
 
-    const dataFor = (profileId: string): ScannerStatus | undefined => {
-        const index = profiles.findIndex(p => p.id === profileId);
-        return index !== -1 ? queries[index]?.data : undefined;
-    };
+    const statusById = useMemo((): Map<string, ScannerStatus> => {
+        const map = new Map<string, ScannerStatus>();
+        profiles.forEach((profile, index) => {
+            const data = queries[index]?.data;
+            if (data) map.set(profile.id, data);
+        });
+        return map;
+    }, [profiles, queries]);
+
+    const dataFor = (profileId: string): ScannerStatus | undefined => statusById.get(profileId);
 
     const isScannerRunning = (profileId: string) => !!dataFor(profileId)?.running;
 

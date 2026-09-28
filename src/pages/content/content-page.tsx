@@ -67,7 +67,7 @@ export const ContentPage = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+                        <div className="grid grid-cols-cards gap-4">
                             {items.map(post => (
                                 <ContentCard key={post.hash} post={post} onClick={openPost} />
                             ))}

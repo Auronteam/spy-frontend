@@ -9,7 +9,7 @@ interface StatCardProps {
 }
 
 const DOT_COLOR_CLASSES: Record<NonNullable<StatCardProps['dotColor']>, string> = {
-    green: 'bg-green-600',
+    green: 'bg-success',
 };
 
 export const StatCard = ({ label, value, dotColor }: StatCardProps) => (

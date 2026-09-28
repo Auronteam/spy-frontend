@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Logo } from '@/components/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useLogin, type LoginFormValues } from './hooks/use-login';
 
@@ -26,9 +27,7 @@ export const LoginPage = () => {
                 <CardContent>
                     <form autoComplete="on" className="space-y-4" onSubmit={handleSubmit}>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium" htmlFor="login">
-                                Login
-                            </label>
+                            <Label htmlFor="login">Login</Label>
                             <Input
                                 id="login"
                                 name="username"
@@ -46,9 +45,7 @@ export const LoginPage = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium" htmlFor="password">
-                                Password
-                            </label>
+                            <Label htmlFor="password">Password</Label>
                             <Input
                                 id="password"
                                 name="password"
@@ -63,7 +60,10 @@ export const LoginPage = () => {
                             />
                         </div>
                         {error && (
-                            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md border border-destructive/20">
+                            <div
+                                role="alert"
+                                className="text-sm text-destructive bg-destructive/10 p-3 rounded-md border border-destructive/20"
+                            >
                                 {error}
                             </div>
                         )}

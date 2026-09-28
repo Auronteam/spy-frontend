@@ -5,6 +5,7 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -67,6 +68,9 @@ export const AddProfileDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Add profile</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Create a new browser profile with an optional proxy and cookies.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4">

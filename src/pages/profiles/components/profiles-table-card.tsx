@@ -29,17 +29,27 @@ export const ProfilesTableCard = ({
     onRetry,
     ...rowProps
 }: ProfilesTableCardProps) => {
-    const { search, setSearch, pagedProfiles, currentPage, totalPages, summary, goPrev, goNext } =
-        useProfilesTable(profiles);
+    const {
+        search,
+        setSearch,
+        pagedProfiles,
+        currentPage,
+        totalPages,
+        summary,
+        emptyMessage,
+        goPrev,
+        goNext,
+    } = useProfilesTable(profiles);
 
     return (
         <Card className="overflow-hidden p-0">
             <div className="flex gap-2 border-b p-3">
                 <Input
+                    aria-label="Search profiles"
                     placeholder="Search profiles..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    className="w-[260px]"
+                    className="w-64"
                 />
             </div>
 
@@ -55,7 +65,7 @@ export const ProfilesTableCard = ({
                 onRetry={onRetry}
                 title="Failed to load profiles"
             >
-                <ProfilesTable profiles={pagedProfiles} {...rowProps} />
+                <ProfilesTable profiles={pagedProfiles} emptyMessage={emptyMessage} {...rowProps} />
                 <ProfilesPagination
                     summary={summary}
                     currentPage={currentPage}

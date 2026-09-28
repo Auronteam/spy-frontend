@@ -137,6 +137,12 @@ client-side:
 - **`RootRedirect`** — the `index` route element; sends to `/profiles` or
   `/content` by role, replacing the old root `page.tsx`'s redirect logic.
 
+**Page routes are lazy-loaded** via the route `lazy` option, keeping the
+pages' named exports: `lazy: () => import('@/pages/x/x-page').then(m => ({
+Component: m.XPage }))` (in `NAV_ITEMS` and for `/login` in `router.tsx`).
+Guards and `DashboardLayout` stay eager; the top-level routes set
+`HydrateFallback: FullScreenSpinner` for the initial chunk load.
+
 Both guards read auth state from `useAuth()` (`src/contexts/auth-context.tsx`)
 and render nothing but a `<Spinner/>` while the initial cookie-verify request
 is in flight (`isLoading`).
@@ -248,19 +254,30 @@ itself, not caught by `isApiError`) is reported to Sentry via `captureError`.
 # Styling Principles
 
 - Tailwind + shadcn/ui, style **"new-york"**, `baseColor` **"zinc"**
-  (`components.json`) — CSS variables defined in `src/index.css` (`:root` for
-  light, `.dark` for dark), matching a design mockup built for this app
-  ("Spy Console" branding). Don't introduce a different base color or hand-roll
-  colors outside the CSS variable palette.
+  (`components.json`) — CSS variables defined in `src/index.css` under
+  `:root` (light only; there is no dark theme), matching a design mockup built
+  for this app ("Spy Console" branding). Don't introduce a different base color
+  or hand-roll colors outside the CSS variable palette.
+- **Status tokens** — `success`/`info`/`warning`, each with `DEFAULT`,
+  `foreground`, `strong`, `muted` and `border` shades (CSS variables in
+  `src/index.css`, mapped in `tailwind.config.ts`): e.g. `bg-success`,
+  `text-success-strong`, `bg-success-muted`, `border-success-border`. Use
+  these instead of raw palette classes like `bg-green-600`/`text-green-700`.
 - `cn()` (`src/lib/utils.ts` — `clsx` + `tailwind-merge`) for any conditional
   or merged `className`; never string-concatenate classes manually.
 - Reusable design-system pieces beyond shadcn's stock primitives:
   - **`StatCard`** (`src/components/stat-card.tsx`) — the label + big number
     (+ optional colored dot) card pattern used for summary stats rows.
-  - **`Badge`'s `success`/`info` variants** (`src/components/ui/badge.tsx`) —
-    green/blue status pills, added on top of shadcn's stock
+  - **`Badge`'s `success`/`info`/`warning` variants**
+    (`src/components/ui/badge.tsx`) — status pills built on the status
+    tokens, added on top of shadcn's stock
     default/secondary/destructive/outline set for domain status states
     (e.g. "Connected"/"Running").
+  - **`Button`'s `success` variant** (`src/components/ui/button.tsx`) — a
+    solid `bg-success` button for positive actions.
 - No inline styles, no arbitrary Tailwind values without a comment explaining
   why (inherited from the general `AI_GUIDELINES.md` rule — nothing looser
-  here).
+  here). Prefer the nearest standard scale value; when a mockup value has no
+  scale equivalent (grid templates, viewport-based dialog sizes), add a named
+  key under `theme.extend` in `tailwind.config.ts` (e.g. `grid-cols-cards`,
+  `max-h-log-viewer`, `aspect-thumb`) instead of an inline `[...]` value.

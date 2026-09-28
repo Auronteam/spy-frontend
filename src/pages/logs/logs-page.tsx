@@ -10,6 +10,7 @@ import { useSelectedProfileScanner } from './hooks/use-selected-profile-scanner'
 import { ProfileSelector } from './components/profile-selector';
 import { LogFilesList } from './components/log-files-list';
 import { LogContentViewer } from './components/log-content-viewer';
+import { joinLogLines } from './utils';
 
 export const LogsPage = () => {
     const { folders, folderId, setFolderId } = useVisionFolders();
@@ -18,7 +19,7 @@ export const LogsPage = () => {
     const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
 
     const streamUrl = selectedProfileId ? getLogStreamUrl(selectedProfileId) : '';
-    const { isLiveMode, isConnected, liveLogContent, toggleLiveMode } = useLogStream(streamUrl, {
+    const { isLiveMode, isConnected, liveLogLines, toggleLiveMode } = useLogStream(streamUrl, {
         onGiveUp: () => refetchFiles(),
     });
     const { isRunning: isScannerRunning } = useSelectedProfileScanner(selectedProfileId);
@@ -47,18 +48,19 @@ export const LogsPage = () => {
         selectedFile,
         setSelectedFile,
         content: logContent,
+        contentLines: logLines,
         contentLoading,
         refetchFiles,
     } = useProfileLogFiles(selectedProfileId, isLiveMode);
 
     const { liveLogRef, staticLogRef, handleScroll } = useLogAutoScroll({
         isLiveMode,
-        liveLogContent,
-        logContent,
+        liveLogLines,
+        logLines,
     });
 
     const handleDownload = () => {
-        const content = isLiveMode ? liveLogContent : logContent;
+        const content = isLiveMode ? joinLogLines(liveLogLines) : logContent;
         const fileName = isLiveMode ? 'live-logs.log' : selectedFile;
 
         if (!fileName || !content) return;
@@ -96,7 +98,7 @@ export const LogsPage = () => {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[264px_minmax(0,1fr)]">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-logs-layout">
                     <LogFilesList
                         files={logFiles}
                         filesLoading={filesLoading}
@@ -109,8 +111,8 @@ export const LogsPage = () => {
                         isLiveMode={isLiveMode}
                         isConnected={isConnected}
                         isScannerRunning={isScannerRunning}
-                        liveLogContent={liveLogContent}
-                        logContent={logContent}
+                        liveLogLines={liveLogLines}
+                        logLines={logLines}
                         contentLoading={contentLoading}
                         liveLogRef={liveLogRef}
                         staticLogRef={staticLogRef}

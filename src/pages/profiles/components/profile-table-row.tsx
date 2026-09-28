@@ -64,12 +64,12 @@ export const ProfileTableRow = ({
                     <Badge variant="warning">On Pause</Badge>
                 ) : active ? (
                     <Badge variant="success">
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-success" />
                         Connected
                     </Badge>
                 ) : (
                     <Badge variant="secondary">
-                        <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70" />
                         Disconnected
                     </Badge>
                 )}
@@ -77,7 +77,7 @@ export const ProfileTableRow = ({
             <TableCell className="px-4">
                 {scannerRunning ? (
                     <Badge variant="info">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-info" />
                         Running
                     </Badge>
                 ) : (

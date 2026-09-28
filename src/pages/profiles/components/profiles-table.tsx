@@ -1,9 +1,17 @@
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import type { Profile } from '@/types/profile';
 import { ProfileTableRow } from './profile-table-row';
 
 interface ProfilesTableProps {
     profiles: Profile[];
+    emptyMessage: string;
     folderId: string | null;
     isVisionActive: (profileId: string) => boolean;
     isVisionReady: (profileId: string) => boolean;
@@ -16,6 +24,7 @@ interface ProfilesTableProps {
 
 export const ProfilesTable = ({
     profiles,
+    emptyMessage,
     folderId,
     isVisionActive,
     isVisionReady,
@@ -36,6 +45,13 @@ export const ProfilesTable = ({
             </TableRow>
         </TableHeader>
         <TableBody>
+            {profiles.length === 0 && (
+                <TableRow>
+                    <TableCell colSpan={5} className="h-24 px-4 text-center text-muted-foreground">
+                        {emptyMessage}
+                    </TableCell>
+                </TableRow>
+            )}
             {profiles.map(profile => (
                 <ProfileTableRow
                     key={profile.id}

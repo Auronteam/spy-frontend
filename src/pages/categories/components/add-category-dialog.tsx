@@ -5,6 +5,7 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -66,6 +67,9 @@ export const AddCategoryDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Add category</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Enter a name and slug for the new category.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4">

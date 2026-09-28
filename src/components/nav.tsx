@@ -35,6 +35,7 @@ export const TopNav = () => {
                         <Link
                             key={s.path}
                             to={s.path}
+                            aria-current={isActive ? 'page' : undefined}
                             className={cn(
                                 'border-b-2 pb-2 text-sm font-medium transition-colors',
                                 isActive

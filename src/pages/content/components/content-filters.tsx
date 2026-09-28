@@ -1,6 +1,7 @@
 import type { DateRange } from 'react-day-picker';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { MultiSelect, type MultiSelectOption } from './multiselect';
 import { RangePicker } from './range-picker';
 import type { PostFilters } from '@/api/db/types';
@@ -26,8 +27,11 @@ export const ContentFilters = ({
 }: ContentFiltersProps) => (
     <Card className="flex flex-wrap items-end gap-3 p-3">
         <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Category</label>
+            <Label htmlFor="content-filter-category" className="text-xs text-muted-foreground">
+                Category
+            </Label>
             <MultiSelect
+                id="content-filter-category"
                 options={categoriesOptions}
                 value={filters.categories}
                 onChange={onCategoriesChange}
@@ -36,8 +40,11 @@ export const ContentFilters = ({
             />
         </div>
         <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Country</label>
+            <Label htmlFor="content-filter-country" className="text-xs text-muted-foreground">
+                Country
+            </Label>
             <MultiSelect
+                id="content-filter-country"
                 options={countriesOptions}
                 value={filters.countries}
                 onChange={onCountriesChange}
@@ -46,8 +53,14 @@ export const ContentFilters = ({
             />
         </div>
         <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted-foreground">Date range</label>
-            <RangePicker dateRange={filters.createdAt} onSelect={onDateRangeChange} />
+            <Label htmlFor="content-filter-date-range" className="text-xs text-muted-foreground">
+                Date range
+            </Label>
+            <RangePicker
+                id="content-filter-date-range"
+                dateRange={filters.createdAt}
+                onSelect={onDateRangeChange}
+            />
         </div>
         <Button variant="outline" className="ml-auto" onClick={onReset}>
             Reset

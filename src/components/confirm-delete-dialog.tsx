@@ -38,8 +38,12 @@ export const ConfirmDeleteDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{shown.title}</DialogTitle>
-                    {shown.description && (
+                    {shown.description ? (
                         <DialogDescription>{shown.description}</DialogDescription>
+                    ) : (
+                        <DialogDescription className="sr-only">
+                            Confirm or cancel the deletion.
+                        </DialogDescription>
                     )}
                 </DialogHeader>
 

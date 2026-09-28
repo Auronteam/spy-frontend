@@ -25,7 +25,14 @@ const ProxyCountry = ({ country }: ProxyCountryProps) => {
 
     return (
         <Tooltip>
-            <TooltipTrigger asChild>{label}</TooltipTrigger>
+            <TooltipTrigger asChild>
+                <span
+                    tabIndex={0}
+                    className="inline-flex rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                    {label}
+                </span>
+            </TooltipTrigger>
             <TooltipContent>{name}</TooltipContent>
         </Tooltip>
     );

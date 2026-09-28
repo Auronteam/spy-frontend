@@ -5,6 +5,7 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -59,6 +60,9 @@ export const EditProfileDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit profile</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Change the profile name or proxy.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4">

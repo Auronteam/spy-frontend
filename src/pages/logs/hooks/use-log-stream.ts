@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { withAuthToken } from '@/lib/client-auth';
+import { appendLogChunk, EMPTY_LIVE_LOG_BUFFER } from '../utils';
+import type { LiveLogBuffer, LogLine } from '../types';
 
 type LogStreamMessage = {
     type: string;
@@ -14,14 +16,14 @@ type UseLogStreamOptions = {
 type UseLogStreamResult = {
     isLiveMode: boolean;
     isConnected: boolean;
-    liveLogContent: string;
+    liveLogLines: readonly LogLine[];
     toggleLiveMode: () => void;
 };
 
 const RECONNECT_BASE_DELAY_MS = 3000;
 const RECONNECT_MAX_DELAY_MS = 30_000;
 const MAX_CONSECUTIVE_FAILURES = 5;
-// Caps the buffer by line count — without it liveLogContent grows unbounded
+// Caps the buffer by line count — without it the live buffer grows unbounded
 // over a long live session, and the viewer renders one <div> per line with no
 // virtualization, so an hours-long watch would gradually hang the tab.
 const MAX_LIVE_LOG_LINES = 2000;
@@ -34,13 +36,6 @@ function isLogStreamMessage(value: unknown): value is LogStreamMessage {
     );
 }
 
-function appendCapped(prev: string, addition: string): string {
-    const combined = prev + addition;
-    const lines = combined.split('\n');
-    if (lines.length <= MAX_LIVE_LOG_LINES) return combined;
-    return lines.slice(-MAX_LIVE_LOG_LINES).join('\n');
-}
-
 function getReconnectDelay(failures: number): number {
     return Math.min(RECONNECT_BASE_DELAY_MS * 2 ** (failures - 1), RECONNECT_MAX_DELAY_MS);
 }
@@ -51,7 +46,7 @@ export function useLogStream(
 ): UseLogStreamResult {
     const [isLiveMode, setIsLiveMode] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [liveLogContent, setLiveLogContent] = useState<string>('');
+    const [liveLogBuffer, setLiveLogBuffer] = useState<LiveLogBuffer>(EMPTY_LIVE_LOG_BUFFER);
 
     const eventSourceRef = useRef<EventSource | null>(null);
     // Mirrors isLiveMode without waiting on batched setState — onerror reads this
@@ -80,7 +75,7 @@ export function useLogStream(
             eventSourceRef.current = null;
         }
         setIsConnected(false);
-        setLiveLogContent('');
+        setLiveLogBuffer(EMPTY_LIVE_LOG_BUFFER);
     }, [clearReconnectTimer]);
 
     const giveUp = useCallback(() => {
@@ -113,7 +108,7 @@ export function useLogStream(
                 if (!isLogStreamMessage(parsed)) return;
                 const content = parsed.content;
                 if (parsed.type === 'log' && content) {
-                    setLiveLogContent(prev => appendCapped(prev, content));
+                    setLiveLogBuffer(prev => appendLogChunk(prev, content, MAX_LIVE_LOG_LINES));
                 }
             } catch (error) {
                 console.error('Error parsing SSE message:', error);
@@ -147,7 +142,7 @@ export function useLogStream(
             // Buffer is cleared only on an explicit user start, not in onopen —
             // otherwise auto-reconnect after a drop would wipe content already
             // shown before the connection broke.
-            setLiveLogContent('');
+            setLiveLogBuffer(EMPTY_LIVE_LOG_BUFFER);
             connect();
         } else {
             isLiveModeRef.current = false;
@@ -163,5 +158,10 @@ export function useLogStream(
         };
     }, [disconnect]);
 
-    return { isLiveMode, isConnected, liveLogContent, toggleLiveMode };
+    return {
+        isLiveMode,
+        isConnected,
+        liveLogLines: liveLogBuffer.lines,
+        toggleLiveMode,
+    };
 }
