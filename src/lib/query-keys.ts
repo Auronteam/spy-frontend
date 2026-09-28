@@ -29,3 +29,14 @@ export const queryKeys = {
             [...queryKeys.logs.all(), 'content', profileId, file] as const,
     },
 };
+
+export const mutationKeys = {
+    vision: {
+        run: (profileId: string) => ['vision', 'run', profileId] as const,
+        stop: (profileId: string) => ['vision', 'stop', profileId] as const,
+    },
+    scanner: {
+        run: (profileId: string) => ['scanner', 'run', profileId] as const,
+        stop: (profileId: string) => ['scanner', 'stop', profileId] as const,
+    },
+};

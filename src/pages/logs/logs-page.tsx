@@ -20,7 +20,9 @@ export const LogsPage = () => {
     const streamUrl = selectedProfileId
         ? `${BACKEND_BASE}/api/logs/stream?profileId=${encodeURIComponent(selectedProfileId)}`
         : '';
-    const { isLiveMode, isConnected, liveLogContent, toggleLiveMode } = useLogStream(streamUrl);
+    const { isLiveMode, isConnected, liveLogContent, toggleLiveMode } = useLogStream(streamUrl, {
+        onGiveUp: () => refetchFiles(),
+    });
     const { isRunning: isScannerRunning } = useSelectedProfileScanner(selectedProfileId);
 
     const handleProfileChange = (value: string) => {
@@ -31,6 +33,14 @@ export const LogsPage = () => {
             toggleLiveMode();
         }
         setSelectedProfileId(value);
+    };
+
+    const handleFolderChange = (value: string) => {
+        if (isLiveMode) {
+            toggleLiveMode();
+        }
+        setSelectedProfileId('');
+        setFolderId(value);
     };
 
     const {
@@ -68,7 +78,7 @@ export const LogsPage = () => {
             <ProfileSelector
                 folders={folders}
                 folderId={folderId}
-                onFolderChange={setFolderId}
+                onFolderChange={handleFolderChange}
                 profiles={profiles}
                 profilesLoading={profilesLoading}
                 selectedProfileId={selectedProfileId}

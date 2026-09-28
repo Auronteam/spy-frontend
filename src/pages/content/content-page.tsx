@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { QueryPageGuard } from '@/components/errors/query-page-guard';
 import { Spinner } from '@/components/ui/spinner';
 import { useFilters } from './hooks/useFilters';
@@ -14,17 +13,13 @@ import { CreativeDialog } from './components/creative-dialog';
 export const ContentPage = () => {
     const { filters, setFilter, clearAll } = useFilters();
     const { categoriesOptions, countriesOptions } = useFiltersOptions();
-    const { page, setPage, pageSize, goToPage, pagesRange } = usePagination();
+    const { page, pageSize, goToPage, pagesRange } = usePagination(filters);
     const { data, isLoading, isError, error, refetch } = usePostsQuery({
         page,
         pageSize,
         filters,
     });
     const { open, selectedPost, openPost, setOpen } = useCreativeDialog();
-
-    useEffect(() => {
-        setPage(1);
-    }, [filters, setPage]);
 
     const items = data?.items ?? [];
     const total = data?.total ?? 0;

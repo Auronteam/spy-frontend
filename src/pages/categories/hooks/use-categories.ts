@@ -26,7 +26,11 @@ export function useCategories() {
     const updateMutation = useMutation({
         mutationFn: ({ slug, title }: { slug: string; title: string }) =>
             updateCategory(slug, { title }),
-        onSuccess: invalidate,
+        onSuccess: () =>
+            Promise.all([
+                invalidate(),
+                queryClient.invalidateQueries({ queryKey: queryKeys.posts.all() }),
+            ]),
     });
 
     const deleteMutation = useMutation({

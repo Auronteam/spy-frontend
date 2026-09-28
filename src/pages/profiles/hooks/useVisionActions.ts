@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { runVisionProfile, stopVisionProfileOnServer } from '@/api/vision-browser';
 import { notifyError } from '@/lib/errors/notify-error';
-import { queryKeys } from '@/lib/query-keys';
+import { mutationKeys, queryKeys } from '@/lib/query-keys';
 import {
     fetchFreshScannerStatus,
     ScannerStopTimeoutError,
@@ -13,15 +13,17 @@ export function useVisionActions(profileId: string, folderId: string | null) {
     const queryClient = useQueryClient();
 
     const runVisionMutation = useMutation({
+        mutationKey: mutationKeys.vision.run(profileId),
         mutationFn: () => runVisionProfile(profileId, folderId ?? undefined),
         onSuccess: () => {
             queryClient.removeQueries({ queryKey: queryKeys.vision.ready(profileId) });
-            queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
+            return queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
         onError: e => notifyError(e),
     });
 
     const stopVisionMutation = useMutation({
+        mutationKey: mutationKeys.vision.stop(profileId),
         mutationFn: async () => {
             const scannerStatus = await fetchFreshScannerStatus(queryClient, profileId);
             if (scannerStatus.running) {
@@ -31,7 +33,7 @@ export function useVisionActions(profileId: string, folderId: string | null) {
         },
         onSuccess: () => {
             queryClient.removeQueries({ queryKey: queryKeys.vision.ready(profileId) });
-            queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
+            return queryClient.invalidateQueries({ queryKey: queryKeys.vision.activeProfiles() });
         },
         onError: e => {
             if (e instanceof ScannerStopTimeoutError) {
@@ -41,6 +43,9 @@ export function useVisionActions(profileId: string, folderId: string | null) {
             notifyError(e);
         },
     });
+
+    const isStarting = useIsMutating({ mutationKey: mutationKeys.vision.run(profileId) }) > 0;
+    const isStopping = useIsMutating({ mutationKey: mutationKeys.vision.stop(profileId) }) > 0;
 
     const stopVision = () => {
         if (!folderId) {
@@ -53,7 +58,7 @@ export function useVisionActions(profileId: string, folderId: string | null) {
     return {
         runVision: () => runVisionMutation.mutate(),
         stopVision,
-        isStarting: runVisionMutation.isPending,
-        isStopping: stopVisionMutation.isPending,
+        isStarting,
+        isStopping,
     };
 }
