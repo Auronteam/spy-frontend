@@ -1,21 +1,22 @@
 import { useEffect, useRef, type RefObject } from 'react';
+import type { LogLine } from '../types';
 
-interface UseLogAutoScrollParams {
+type UseLogAutoScrollParams = {
     isLiveMode: boolean;
-    liveLogContent: string;
-    logContent: string;
-}
+    liveLogLines: readonly LogLine[];
+    logLines: readonly LogLine[];
+};
 
-interface UseLogAutoScrollResult {
+type UseLogAutoScrollResult = {
     liveLogRef: RefObject<HTMLDivElement | null>;
     staticLogRef: RefObject<HTMLDivElement | null>;
     handleScroll: () => void;
-}
+};
 
 export function useLogAutoScroll({
     isLiveMode,
-    liveLogContent,
-    logContent,
+    liveLogLines,
+    logLines,
 }: UseLogAutoScrollParams): UseLogAutoScrollResult {
     const liveLogRef = useRef<HTMLDivElement>(null);
     const staticLogRef = useRef<HTMLDivElement>(null);
@@ -37,13 +38,13 @@ export function useLogAutoScroll({
                 }
             });
         }
-    }, [liveLogContent, isLiveMode]);
+    }, [liveLogLines, isLiveMode]);
 
     useEffect(() => {
-        if (!isLiveMode && staticLogRef.current && logContent) {
+        if (!isLiveMode && staticLogRef.current && logLines.length > 0) {
             staticLogRef.current.scrollTop = staticLogRef.current.scrollHeight;
         }
-    }, [logContent, isLiveMode]);
+    }, [logLines, isLiveMode]);
 
     return { liveLogRef, staticLogRef, handleScroll };
 }

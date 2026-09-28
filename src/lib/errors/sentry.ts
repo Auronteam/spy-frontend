@@ -32,7 +32,3 @@ export function captureError(error: unknown, context?: Record<string, unknown>):
     }
     void ensureFactory().then(module => module.captureExceptionInstance(error, context));
 }
-
-export function getLastEventId(): string | undefined {
-    return factory?.lastEventIdInstance();
-}

@@ -5,6 +5,7 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -46,6 +47,9 @@ export const EditCategoryDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit category</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Change the category name.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-2">

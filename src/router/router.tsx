@@ -5,7 +5,7 @@ import { ProtectedRoute } from '@/router/protected-route';
 import { GuestRoute } from '@/router/guest-route';
 import { DashboardLayout } from '@/router/dashboard-layout';
 import { RootRedirect } from '@/router/root-redirect';
-import { LoginPage } from '@/pages/login/login-page';
+import { FullScreenSpinner } from '@/router/full-screen-spinner';
 
 const publicItems = NAV_ITEMS.filter(item => !item.allowedRoles);
 const adminItems = NAV_ITEMS.filter(item => item.allowedRoles?.includes('admin'));
@@ -13,25 +13,27 @@ const adminItems = NAV_ITEMS.filter(item => item.allowedRoles?.includes('admin')
 export const router = createBrowserRouter([
     {
         element: <GuestRoute />,
-        children: [{ path: ROUTES.login, element: <LoginPage /> }],
+        HydrateFallback: FullScreenSpinner,
+        children: [
+            {
+                path: ROUTES.login,
+                lazy: () =>
+                    import('@/pages/login/login-page').then(m => ({ Component: m.LoginPage })),
+            },
+        ],
     },
     {
         element: <ProtectedRoute />,
+        HydrateFallback: FullScreenSpinner,
         children: [
             {
                 element: <DashboardLayout />,
                 children: [
                     { index: true, element: <RootRedirect /> },
-                    ...publicItems.map(({ path, element: Element }) => ({
-                        path,
-                        element: <Element />,
-                    })),
+                    ...publicItems.map(({ path, lazy }) => ({ path, lazy })),
                     {
                         element: <ProtectedRoute allowedRoles={['admin']} />,
-                        children: adminItems.map(({ path, element: Element }) => ({
-                            path,
-                            element: <Element />,
-                        })),
+                        children: adminItems.map(({ path, lazy }) => ({ path, lazy })),
                     },
                 ],
             },

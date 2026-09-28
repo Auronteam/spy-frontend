@@ -1,5 +1,5 @@
 import type { PostDto } from '@/api/db/dto';
-import type { Post } from '@/pages/content/types';
+import type { Post } from '@/api/db/types';
 
 export function mapPostDtoToPost(dto: PostDto): Post {
     return {

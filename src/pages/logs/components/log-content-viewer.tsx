@@ -3,63 +3,41 @@ import { Download } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { cn } from '@/lib/utils';
+import type { LogLine } from '../types';
+import { LogLines } from './log-lines';
 
-const TIMESTAMP_PATTERN = /^\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2})\]\s?(.*)$/;
-
-function splitLogLine(line: string): { time: string; message: string } {
-    const match = line.match(TIMESTAMP_PATTERN);
-    return match ? { time: match[1], message: match[2] } : { time: '', message: line };
+interface LiveStatusDotProps {
+    live: boolean;
+    label: string;
 }
 
-function LiveStatusDot({ live, label }: { live: boolean; label: string }) {
+const LiveStatusDot = ({ live, label }: LiveStatusDotProps) => {
     return (
         <span
-            className={`flex items-center gap-1.5 text-xs font-medium ${live ? 'text-green-700' : 'text-muted-foreground'}`}
+            className={cn(
+                'flex items-center gap-1.5 text-xs font-medium',
+                live ? 'text-success-strong' : 'text-muted-foreground'
+            )}
         >
-            <span className={`h-1.5 w-1.5 rounded-full ${live ? 'bg-green-600' : 'bg-zinc-400'}`} />
+            <span
+                className={cn(
+                    'h-1.5 w-1.5 rounded-full',
+                    live ? 'bg-success' : 'bg-muted-foreground/70'
+                )}
+            />
             {label}
         </span>
     );
-}
-
-function LogLines({ content, placeholder }: { content: string; placeholder: string }) {
-    const lines = content.split('\n').filter(line => line.length > 0);
-
-    if (lines.length === 0) {
-        return (
-            <div className="px-3.5 py-8 text-center text-sm text-muted-foreground">
-                {placeholder}
-            </div>
-        );
-    }
-
-    return (
-        <>
-            {lines.map((line, idx) => {
-                const { time, message } = splitLogLine(line);
-                return (
-                    <div
-                        key={idx}
-                        className="grid grid-cols-[80px_1fr] items-start gap-3 border-b px-3.5 py-2 text-xs last:border-0"
-                    >
-                        <span className="font-mono text-muted-foreground">{time}</span>
-                        <span className="whitespace-pre-wrap break-words font-mono text-foreground/90">
-                            {message}
-                        </span>
-                    </div>
-                );
-            })}
-        </>
-    );
-}
+};
 
 interface LogContentViewerProps {
     selectedFile: string;
     isLiveMode: boolean;
     isConnected: boolean;
     isScannerRunning: boolean;
-    liveLogContent: string;
-    logContent: string;
+    liveLogLines: readonly LogLine[];
+    logLines: readonly LogLine[];
     contentLoading: boolean;
     liveLogRef: RefObject<HTMLDivElement | null>;
     staticLogRef: RefObject<HTMLDivElement | null>;
@@ -73,8 +51,8 @@ export const LogContentViewer = ({
     isLiveMode,
     isConnected,
     isScannerRunning,
-    liveLogContent,
-    logContent,
+    liveLogLines,
+    logLines,
     contentLoading,
     liveLogRef,
     staticLogRef,
@@ -82,7 +60,7 @@ export const LogContentViewer = ({
     onToggleLiveMode,
     onDownload,
 }: LogContentViewerProps) => {
-    const hasContent = isLiveMode ? Boolean(liveLogContent) : Boolean(logContent);
+    const hasContent = (isLiveMode ? liveLogLines : logLines).length > 0;
 
     return (
         <Card className="overflow-hidden p-0">
@@ -130,13 +108,13 @@ export const LogContentViewer = ({
                     <div
                         ref={liveLogRef}
                         onScroll={onScroll}
-                        className="max-h-[460px] overflow-auto"
+                        className="max-h-log-viewer overflow-auto"
                     >
-                        <LogLines content={liveLogContent} placeholder="Waiting for live logs..." />
+                        <LogLines lines={liveLogLines} placeholder="Waiting for live logs..." />
                     </div>
                 ) : (
-                    <div ref={staticLogRef} className="max-h-[460px] overflow-auto">
-                        <LogLines content={logContent} placeholder="No content to display" />
+                    <div ref={staticLogRef} className="max-h-log-viewer overflow-auto">
+                        <LogLines lines={logLines} placeholder="No content to display" />
                     </div>
                 )}
             </CardContent>

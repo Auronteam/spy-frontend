@@ -1,6 +1,6 @@
 import { skipToken, useQuery } from '@tanstack/react-query';
 import { fetchVisionProfiles } from '@/api/vision-browser';
-import type { Profile } from '@/pages/profiles/types';
+import type { Profile } from '@/types/profile';
 import { queryKeys } from '@/lib/query-keys';
 
 // Stable reference: while folderId isn't chosen yet, the query is disabled
@@ -9,7 +9,14 @@ import { queryKeys } from '@/lib/query-keys';
 // (useScannerStatus, useVisionReady) keep `profiles` in their effect deps.
 const EMPTY_PROFILES: Profile[] = [];
 
-export const useVisionProfiles = (folderId: string | null) => {
+type UseVisionProfilesResult = {
+    profiles: Profile[];
+    loading: boolean;
+    error: Error | null;
+    refetch: () => void;
+};
+
+export function useVisionProfiles(folderId: string | null): UseVisionProfilesResult {
     const query = useQuery({
         queryKey: queryKeys.vision.profiles(folderId),
         queryFn: folderId ? () => fetchVisionProfiles(folderId) : skipToken,
@@ -21,4 +28,4 @@ export const useVisionProfiles = (folderId: string | null) => {
         error: query.error,
         refetch: query.refetch,
     };
-};
+}

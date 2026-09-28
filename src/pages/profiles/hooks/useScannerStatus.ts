@@ -1,29 +1,47 @@
-import { useQueries } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { fetchScannerStatus } from '@/api/scanner';
 import type { ScannerStatus } from '@/api/scanner';
-import type { Profile } from '@/pages/profiles/types';
+import type { Profile } from '@/types/profile';
 import { queryKeys } from '@/lib/query-keys';
 
 const SCANNER_POLL_INTERVAL_MS = 15000;
+const SCANNER_IDLE_POLL_INTERVAL_MS = 30000;
 
 // One query per profile via useQueries — same pattern as useVisionReady.
 // Every profile is queried regardless of who started its scanner (or
-// whether it was already running before this page loaded), and polling
-// self-stops once running:false comes back (function-form refetchInterval).
-export const useScannerStatus = (profiles: Profile[]) => {
+// whether it was already running before this page loaded). Running scanners
+// poll faster than stopped ones (function-form refetchInterval).
+type UseScannerStatusResult = {
+    isScannerRunning: (profileId: string) => boolean;
+    isScannerPaused: (profileId: string) => boolean;
+    pauseMsLeft: (profileId: string) => number;
+    refreshScannerStatuses: () => Promise<void>;
+};
+
+export function useScannerStatus(profiles: Profile[]): UseScannerStatusResult {
+    const queryClient = useQueryClient();
     const queries = useQueries({
         queries: profiles.map(profile => ({
             queryKey: queryKeys.scanner.status(profile.id),
             queryFn: () => fetchScannerStatus(profile.id),
             refetchInterval: (query: { state: { data?: ScannerStatus } }) =>
-                query.state.data?.running ? SCANNER_POLL_INTERVAL_MS : false,
+                query.state.data?.running
+                    ? SCANNER_POLL_INTERVAL_MS
+                    : SCANNER_IDLE_POLL_INTERVAL_MS,
         })),
     });
 
-    const dataFor = (profileId: string): ScannerStatus | undefined => {
-        const index = profiles.findIndex(p => p.id === profileId);
-        return index !== -1 ? queries[index]?.data : undefined;
-    };
+    const statusById = useMemo((): Map<string, ScannerStatus> => {
+        const map = new Map<string, ScannerStatus>();
+        profiles.forEach((profile, index) => {
+            const data = queries[index]?.data;
+            if (data) map.set(profile.id, data);
+        });
+        return map;
+    }, [profiles, queries]);
+
+    const dataFor = (profileId: string): ScannerStatus | undefined => statusById.get(profileId);
 
     const isScannerRunning = (profileId: string) => !!dataFor(profileId)?.running;
 
@@ -35,9 +53,13 @@ export const useScannerStatus = (profiles: Profile[]) => {
         return Math.max(0, t - Date.now());
     };
 
+    const refreshScannerStatuses = () =>
+        queryClient.invalidateQueries({ queryKey: queryKeys.scanner.all() });
+
     return {
         isScannerRunning,
         isScannerPaused,
         pauseMsLeft,
+        refreshScannerStatuses,
     };
-};
+}

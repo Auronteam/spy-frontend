@@ -3,8 +3,15 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchActiveVisionProfiles } from '@/api/vision-browser';
 import { queryKeys } from '@/lib/query-keys';
 
-export const useActiveProfiles = (folderId: string | null) => {
-    const { data, isLoading, error, refetch } = useQuery({
+type UseActiveProfilesResult = {
+    activeProfileIds: string[];
+    error: Error | null;
+    refreshActiveProfiles: () => Promise<void>;
+    isVisionActive: (profileId: string) => boolean;
+};
+
+export function useActiveProfiles(folderId: string | null): UseActiveProfilesResult {
+    const { data, error, refetch } = useQuery({
         queryKey: queryKeys.vision.activeProfiles(),
         queryFn: fetchActiveVisionProfiles,
         enabled: !!folderId,
@@ -28,9 +35,8 @@ export const useActiveProfiles = (folderId: string | null) => {
 
     return {
         activeProfileIds,
-        loading: isLoading,
         error,
         refreshActiveProfiles,
         isVisionActive,
     };
-};
+}

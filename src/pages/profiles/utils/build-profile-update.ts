@@ -1,4 +1,5 @@
-import type { ProfileProxy, UpdateProfileInput } from '@/pages/profiles/types';
+import type { UpdateProfileInput } from '@/api/vision-browser/types';
+import type { ProfileProxy } from '@/types/profile';
 
 export function formatProxy(proxy: ProfileProxy | null): string {
     return proxy ? `${proxy.ip}:${proxy.port}` : '';

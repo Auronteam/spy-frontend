@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { QueryPageGuard } from '@/components/errors/query-page-guard';
 import { Spinner } from '@/components/ui/spinner';
 import { useFilters } from './hooks/useFilters';
@@ -12,19 +11,15 @@ import { ContentPagination } from './components/pagination';
 import { CreativeDialog } from './components/creative-dialog';
 
 export const ContentPage = () => {
-    const { filters, setFilter, clearAll } = useFilters();
+    const { filters, setListFilter, setDateRange, clearAll } = useFilters();
     const { categoriesOptions, countriesOptions } = useFiltersOptions();
-    const { page, setPage, pageSize, goToPage, pagesRange } = usePagination();
+    const { page, pageSize, goToPage, getPagesRange } = usePagination(filters);
     const { data, isLoading, isError, error, refetch } = usePostsQuery({
         page,
         pageSize,
         filters,
     });
     const { open, selectedPost, openPost, setOpen } = useCreativeDialog();
-
-    useEffect(() => {
-        setPage(1);
-    }, [filters, setPage]);
 
     const items = data?.items ?? [];
     const total = data?.total ?? 0;
@@ -48,9 +43,9 @@ export const ContentPage = () => {
                 filters={filters}
                 categoriesOptions={categoriesOptions}
                 countriesOptions={countriesOptions}
-                onCategoriesChange={value => setFilter('categories', value)}
-                onCountriesChange={value => setFilter('countries', value)}
-                onDateRangeChange={value => setFilter('createdAt', value)}
+                onCategoriesChange={values => setListFilter('categories', values)}
+                onCountriesChange={values => setListFilter('countries', values)}
+                onDateRangeChange={setDateRange}
                 onReset={clearAll}
             />
 
@@ -72,7 +67,7 @@ export const ContentPage = () => {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+                        <div className="grid grid-cols-cards gap-4">
                             {items.map(post => (
                                 <ContentCard key={post.hash} post={post} onClick={openPost} />
                             ))}
@@ -80,10 +75,9 @@ export const ContentPage = () => {
 
                         <ContentPagination
                             page={page}
-                            totalPages={totalPages}
                             canPrev={page > 1}
                             canNext={page < totalPages}
-                            pagesRange={pagesRange(totalPages)}
+                            pagesRange={getPagesRange(totalPages)}
                             goToPage={p => goToPage(p, totalPages)}
                         />
                     </>

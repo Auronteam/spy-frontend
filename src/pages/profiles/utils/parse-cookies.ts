@@ -1,4 +1,4 @@
-import type { VisionCookie } from '@/pages/profiles/types';
+import type { VisionCookie } from '@/api/vision-browser/types';
 
 // `expires` is a Unix timestamp (seconds), not a duration — default a cookie
 // missing it to one year from now, matching a long-lived session cookie.

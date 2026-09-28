@@ -1,13 +1,40 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+    type UseMutateFunction,
+} from '@tanstack/react-query';
 import {
     createCategory,
     deleteCategory,
     getCategoriesList,
     updateCategory,
+    type Category,
 } from '@/api/db/categories';
 import { queryKeys } from '@/lib/query-keys';
 
-export function useCategories() {
+type CreateCategoryInput = Parameters<typeof createCategory>[0];
+
+type UpdateCategoryInput = {
+    slug: string;
+    title: string;
+};
+
+export type UseCategoriesResult = {
+    categories: Category[];
+    isLoading: boolean;
+    isError: boolean;
+    error: Error | null;
+    refetch: () => void;
+    createCategory: UseMutateFunction<Category, Error, CreateCategoryInput>;
+    isCreating: boolean;
+    updateCategory: UseMutateFunction<Category, Error, UpdateCategoryInput>;
+    isUpdating: boolean;
+    deleteCategory: UseMutateFunction<void, Error, string>;
+    isDeleting: boolean;
+};
+
+export function useCategories(): UseCategoriesResult {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -24,9 +51,12 @@ export function useCategories() {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ slug, title }: { slug: string; title: string }) =>
-            updateCategory(slug, { title }),
-        onSuccess: invalidate,
+        mutationFn: ({ slug, title }: UpdateCategoryInput) => updateCategory(slug, { title }),
+        onSuccess: () =>
+            Promise.all([
+                invalidate(),
+                queryClient.invalidateQueries({ queryKey: queryKeys.posts.all() }),
+            ]),
     });
 
     const deleteMutation = useMutation({
@@ -39,10 +69,12 @@ export function useCategories() {
         isLoading: query.isLoading,
         isError: query.isError,
         error: query.error,
+        refetch: query.refetch,
         createCategory: createMutation.mutate,
         isCreating: createMutation.isPending,
         updateCategory: updateMutation.mutate,
         isUpdating: updateMutation.isPending,
         deleteCategory: deleteMutation.mutate,
+        isDeleting: deleteMutation.isPending,
     };
 }

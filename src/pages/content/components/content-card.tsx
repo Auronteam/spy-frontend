@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { getFlagEmoji } from '@/lib/country';
-import { getDriveFileSrc } from '../utils';
-import type { Post } from '../types';
+import { getDriveFileSrc } from '@/api/google';
+import type { Post } from '@/api/db/types';
 
 interface ContentCardProps {
     post: Post;
@@ -9,27 +9,22 @@ interface ContentCardProps {
 }
 
 export const ContentCard = ({ post, onClick }: ContentCardProps) => (
-    <div
-        role="button"
-        tabIndex={0}
+    <button
+        type="button"
         onClick={() => onClick(post)}
-        onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onClick(post);
-            }
-        }}
-        className="flex cursor-pointer flex-col overflow-hidden rounded-lg border bg-card transition-colors hover:border-zinc-300 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        className="flex w-full flex-col overflow-hidden rounded-lg border bg-card text-left transition-colors hover:border-ring/20 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-        <div className="aspect-[4/3] bg-muted">
+        <div className="aspect-thumb bg-muted">
             <img
                 src={getDriveFileSrc(post.creativeImageUrl)}
                 alt={`${post.category.title} creative — ${post.geo}`}
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover"
             />
         </div>
         <div className="flex items-center justify-between gap-2 px-3 py-2">
-            <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-600">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                 <span className="text-sm leading-none">{getFlagEmoji(post.geo)}</span>
                 <span className="font-mono">{post.geo}</span>
             </span>
@@ -37,5 +32,5 @@ export const ContentCard = ({ post, onClick }: ContentCardProps) => (
                 {post.category.title}
             </Badge>
         </div>
-    </div>
+    </button>
 );

@@ -1,6 +1,6 @@
 import { Select, SelectItem } from '@/components/ui/select';
-import type { VisionFolder } from '@/hooks/useVisionFolders';
-import type { Profile } from '@/pages/profiles/types';
+import type { VisionFolder } from '@/types/vision-folder';
+import type { Profile } from '@/types/profile';
 
 interface ProfileSelectorProps {
     folders: VisionFolder[];
@@ -8,7 +8,7 @@ interface ProfileSelectorProps {
     onFolderChange: (folderId: string) => void;
     profiles: Profile[];
     profilesLoading: boolean;
-    selectedProfileId: string;
+    selectedProfileId: string | null;
     onProfileChange: (profileId: string) => void;
 }
 
@@ -24,7 +24,12 @@ export const ProfileSelector = ({
     return (
         <div className="flex flex-wrap items-center gap-3">
             {folders.length > 1 && (
-                <Select value={folderId ?? ''} onValueChange={onFolderChange} className="max-w-xs">
+                <Select
+                    value={folderId ?? ''}
+                    onValueChange={onFolderChange}
+                    className="max-w-xs"
+                    aria-label="Folder"
+                >
                     {folders.map(folder => (
                         <SelectItem key={folder.id} value={folder.id}>
                             {folder.name ?? folder.id}
@@ -34,9 +39,10 @@ export const ProfileSelector = ({
             )}
 
             <Select
-                value={selectedProfileId}
+                value={selectedProfileId ?? ''}
                 onValueChange={onProfileChange}
                 className="max-w-xs"
+                aria-label="Profile"
                 disabled={profilesLoading || profiles.length === 0}
             >
                 <SelectItem value="">

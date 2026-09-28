@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { skipToken, useQuery } from '@tanstack/react-query';
 import { fetchProfileLogContent, fetchProfileLogFiles } from '@/api/logs';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
-import type { LogFile } from '../types';
+import type { LogFile } from '@/api/logs/types';
+import { parseLogContent } from '../utils';
+import type { LogLine } from '../types';
 
 const CONTENT_LINES = '1000';
 const CONTENT_TAIL = true;
@@ -18,6 +20,7 @@ type UseProfileLogFilesResult = {
     selectedFile: string;
     setSelectedFile: (fileName: string) => void;
     content: string;
+    contentLines: readonly LogLine[];
     contentLoading: boolean;
     refetchFiles: () => void;
 };
@@ -62,6 +65,9 @@ export function useProfileLogFiles(
                 : skipToken,
     });
 
+    const content = contentQuery.data ?? '';
+    const contentLines = useMemo<LogLine[]>(() => parseLogContent(content), [content]);
+
     useEffect(() => {
         if (contentQuery.isError) {
             notifyError(contentQuery.error, 'Failed to load log content');
@@ -73,7 +79,8 @@ export function useProfileLogFiles(
         filesLoading: filesQuery.isLoading,
         selectedFile,
         setSelectedFile,
-        content: contentQuery.data ?? '',
+        content,
+        contentLines,
         contentLoading: contentQuery.isLoading,
         refetchFiles: filesQuery.refetch,
     };

@@ -6,15 +6,19 @@ export const queryKeys = {
         ready: (profileId: string) => ['vision', 'ready', profileId] as const,
     },
     scanner: {
-        status: (profileId: string) => ['scanner', 'status', profileId] as const,
+        all: () => ['scanner'] as const,
+        status: (profileId: string | null) =>
+            [...queryKeys.scanner.all(), 'status', profileId] as const,
     },
     posts: {
+        all: () => ['posts'] as const,
         list: <TFilters>(page: number, pageSize: number, filters: TFilters) =>
-            ['posts', page, pageSize, filters] as const,
+            [...queryKeys.posts.all(), page, pageSize, filters] as const,
     },
     categories: {
         all: () => ['categories'] as const,
         list: () => [...queryKeys.categories.all(), 'list'] as const,
+        withPosts: () => [...queryKeys.categories.all(), 'with-posts'] as const,
     },
     countries: {
         list: () => ['countries', 'list'] as const,
@@ -24,5 +28,16 @@ export const queryKeys = {
         files: (profileId: string | null) => [...queryKeys.logs.all(), 'files', profileId] as const,
         content: (profileId: string | null, file: string) =>
             [...queryKeys.logs.all(), 'content', profileId, file] as const,
+    },
+};
+
+export const mutationKeys = {
+    vision: {
+        run: (profileId: string) => ['vision', 'run', profileId] as const,
+        stop: (profileId: string) => ['vision', 'stop', profileId] as const,
+    },
+    scanner: {
+        run: (profileId: string) => ['scanner', 'run', profileId] as const,
+        stop: (profileId: string) => ['scanner', 'stop', profileId] as const,
     },
 };

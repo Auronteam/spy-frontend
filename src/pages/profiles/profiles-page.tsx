@@ -1,25 +1,16 @@
-import { useMemo, useState } from 'react';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectItem } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { StatCard } from '@/components/stat-card';
-import { Spinner } from '@/components/ui/spinner';
-import { QueryPageGuard } from '@/components/errors/query-page-guard';
 import { useVisionFolders } from '@/hooks/useVisionFolders';
 import { useVisionProfiles } from '@/hooks/useVisionProfiles';
 import { useActiveProfiles } from './hooks/useActiveProfiles';
 import { useScannerStatus } from './hooks/useScannerStatus';
 import { useVisionReady } from './hooks/useVisionReady';
 import { useProfileDialogs } from './hooks/use-profile-dialogs';
-import { ProfileTableRow } from './components/profile-table-row';
+import { ProfilesTableCard } from './components/profiles-table-card';
 import { AddProfileDialog } from './components/add-profile-dialog';
 import { EditProfileDialog } from './components/edit-profile-dialog';
 import { DeleteProfileDialog } from './components/delete-profile-dialog';
-import { formatPageSummary } from './utils/format-page-summary';
-
-const PAGE_SIZE = 10;
 
 export const ProfilesPage = () => {
     const {
@@ -41,26 +32,11 @@ export const ProfilesPage = () => {
         refreshActiveProfiles,
         isVisionActive,
     } = useActiveProfiles(folderId);
-    const { isScannerRunning, isScannerPaused, pauseMsLeft } = useScannerStatus(profiles);
+    const { isScannerRunning, isScannerPaused, pauseMsLeft, refreshScannerStatuses } =
+        useScannerStatus(profiles);
     const { isVisionReady } = useVisionReady(profiles, isVisionActive);
     const { addDialog, editDialog, deleteDialog, openAddDialog, openEditDialog, openDeleteDialog } =
         useProfileDialogs(folderId);
-
-    const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
-
-    const filteredProfiles = useMemo(() => {
-        const q = search.trim().toLowerCase();
-        if (!q) return profiles;
-        return profiles.filter(p => p.name.toLowerCase().includes(q));
-    }, [profiles, search]);
-
-    const totalPages = Math.max(1, Math.ceil(filteredProfiles.length / PAGE_SIZE));
-    const currentPage = Math.min(page, totalPages);
-    const pagedProfiles = filteredProfiles.slice(
-        (currentPage - 1) * PAGE_SIZE,
-        currentPage * PAGE_SIZE
-    );
 
     const scannersRunningCount = profiles.filter(p => isScannerRunning(p.id)).length;
 
@@ -70,6 +46,7 @@ export const ProfilesPage = () => {
     const handleRefresh = () => {
         refetchProfiles();
         refreshActiveProfiles();
+        refreshScannerStatuses();
     };
 
     return (
@@ -92,7 +69,12 @@ export const ProfilesPage = () => {
             </div>
 
             {folders.length > 1 && (
-                <Select value={folderId ?? ''} onValueChange={setFolderId} className="max-w-xs">
+                <Select
+                    aria-label="Folder"
+                    value={folderId ?? ''}
+                    onValueChange={setFolderId}
+                    className="max-w-xs"
+                >
                     {folders.map(folder => (
                         <SelectItem key={folder.id} value={folder.id}>
                             {folder.name ?? folder.id}
@@ -113,90 +95,20 @@ export const ProfilesPage = () => {
                 <StatCard label="Scanners running" value={scannersRunningCount} />
             </div>
 
-            <Card className="overflow-hidden p-0">
-                <div className="flex gap-2 border-b p-3">
-                    <Input
-                        placeholder="Search profiles..."
-                        value={search}
-                        onChange={e => {
-                            setSearch(e.target.value);
-                            setPage(1);
-                        }}
-                        className="w-[260px]"
-                    />
-                </div>
-
-                <QueryPageGuard
-                    isLoading={isLoading}
-                    loadingFallback={
-                        <div className="py-8">
-                            <Spinner />
-                        </div>
-                    }
-                    isError={Boolean(error)}
-                    error={error}
-                    onRetry={handleRefresh}
-                    title="Failed to load profiles"
-                >
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="px-4">Profile name</TableHead>
-                                <TableHead className="px-4">Proxy</TableHead>
-                                <TableHead className="px-4">Connection</TableHead>
-                                <TableHead className="px-4">Scanner</TableHead>
-                                <TableHead className="px-4 text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {pagedProfiles.map(profile => (
-                                <ProfileTableRow
-                                    key={profile.id}
-                                    profile={profile}
-                                    folderId={folderId}
-                                    active={isVisionActive(profile.id)}
-                                    visionReady={isVisionReady(profile.id)}
-                                    paused={isScannerPaused(profile.id)}
-                                    pauseMsLeft={pauseMsLeft(profile.id)}
-                                    scannerRunning={isScannerRunning(profile.id)}
-                                    onEdit={openEditDialog}
-                                    onDelete={openDeleteDialog}
-                                />
-                            ))}
-                        </TableBody>
-                    </Table>
-
-                    <div className="flex items-center justify-between border-t px-4 py-2.5 text-xs text-muted-foreground">
-                        <span>
-                            {formatPageSummary(
-                                currentPage,
-                                PAGE_SIZE,
-                                pagedProfiles.length,
-                                filteredProfiles.length,
-                                profiles.length
-                            )}
-                        </span>
-                        <div className="flex gap-1.5">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={currentPage <= 1}
-                                onClick={() => setPage(p => p - 1)}
-                            >
-                                Previous
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                disabled={currentPage >= totalPages}
-                                onClick={() => setPage(p => p + 1)}
-                            >
-                                Next
-                            </Button>
-                        </div>
-                    </div>
-                </QueryPageGuard>
-            </Card>
+            <ProfilesTableCard
+                profiles={profiles}
+                folderId={folderId}
+                isLoading={isLoading}
+                error={error}
+                onRetry={handleRefresh}
+                isVisionActive={isVisionActive}
+                isVisionReady={isVisionReady}
+                isScannerPaused={isScannerPaused}
+                pauseMsLeft={pauseMsLeft}
+                isScannerRunning={isScannerRunning}
+                onEdit={openEditDialog}
+                onDelete={openDeleteDialog}
+            />
 
             <AddProfileDialog {...addDialog} />
             <EditProfileDialog {...editDialog} />

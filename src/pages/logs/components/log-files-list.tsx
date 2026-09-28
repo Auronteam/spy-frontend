@@ -1,8 +1,9 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
-import { formatDateTime, formatFileSize } from '@/lib/utils';
-import type { LogFile } from '@/pages/logs/types';
+import { cn } from '@/lib/utils';
+import { formatDateTime, formatFileSize } from '../utils';
+import type { LogFile } from '@/api/logs/types';
 
 interface LogFilesListProps {
     files: LogFile[];
@@ -29,6 +30,8 @@ export const LogFilesList = ({
                     className="h-6 w-6 p-0"
                     onClick={onRefetch}
                     disabled={filesLoading}
+                    aria-label="Refresh log files"
+                    title="Refresh log files"
                 >
                     {filesLoading ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -43,13 +46,14 @@ export const LogFilesList = ({
                         key={file.name}
                         type="button"
                         aria-pressed={selectedFile === file.name}
-                        className={`flex flex-col gap-0.5 rounded-md px-2.5 py-2 text-left transition-colors ${
+                        className={cn(
+                            'flex flex-col gap-0.5 rounded-md px-2.5 py-2 text-left transition-colors',
                             selectedFile === file.name ? 'bg-muted' : 'hover:bg-muted/60'
-                        }`}
+                        )}
                         onClick={() => onSelectFile(file.name)}
                     >
                         <span className="font-mono text-xs font-medium">{file.name}</span>
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-xs text-muted-foreground">
                             {formatFileSize(file.size)} · {formatDateTime(file.modified)}
                         </span>
                     </button>

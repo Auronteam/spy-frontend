@@ -3,7 +3,7 @@ import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useVisionActions } from '../hooks/useVisionActions';
 import { useScannerActions } from '../hooks/useScannerActions';
-import type { Profile } from '../types';
+import type { Profile } from '@/types/profile';
 import { VisionButtons } from './vision-buttons';
 import { ScannerButtons } from './scanner-buttons';
 import { ProfileActionButton } from './profile-action-button';
@@ -32,7 +32,7 @@ export const ProfileTableRow = ({
     onEdit,
     onDelete,
 }: ProfileTableRowProps) => {
-    const vision = useVisionActions(profile.id, folderId, scannerRunning);
+    const vision = useVisionActions(profile.id, folderId);
     const scanner = useScannerActions(profile.id, folderId);
 
     const visionState = {
@@ -64,12 +64,12 @@ export const ProfileTableRow = ({
                     <Badge variant="warning">On Pause</Badge>
                 ) : active ? (
                     <Badge variant="success">
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-success" />
                         Connected
                     </Badge>
                 ) : (
                     <Badge variant="secondary">
-                        <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70" />
                         Disconnected
                     </Badge>
                 )}
@@ -77,7 +77,7 @@ export const ProfileTableRow = ({
             <TableCell className="px-4">
                 {scannerRunning ? (
                     <Badge variant="info">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-info" />
                         Running
                     </Badge>
                 ) : (

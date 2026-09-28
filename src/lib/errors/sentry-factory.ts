@@ -16,7 +16,3 @@ export function captureExceptionInstance(
 ): string {
     return Sentry.captureException(error, { extra: context });
 }
-
-export function lastEventIdInstance(): string | undefined {
-    return Sentry.lastEventId();
-}

@@ -5,6 +5,7 @@ import {
     Dialog,
     DialogClose,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -12,7 +13,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { buildProfileUpdate, formatProxy } from '@/pages/profiles/utils/build-profile-update';
-import type { Profile, UpdateProfileInput } from '@/pages/profiles/types';
+import type { UpdateProfileInput } from '@/api/vision-browser/types';
+import type { Profile } from '@/types/profile';
 import { ProxyInfo } from './proxy-info';
 
 interface EditProfileDialogProps {
@@ -58,6 +60,9 @@ export const EditProfileDialog = ({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit profile</DialogTitle>
+                    <DialogDescription className="sr-only">
+                        Change the profile name or proxy.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4">

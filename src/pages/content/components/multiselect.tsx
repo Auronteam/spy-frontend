@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useDismissiblePopup } from '../hooks/use-dismissible-popup';
 
 export type MultiSelectOption = {
     value: string;
@@ -8,6 +10,7 @@ export type MultiSelectOption = {
 };
 
 interface MultiSelectProps {
+    id?: string;
     options: MultiSelectOption[];
     value: string[];
     onChange: (next: string[]) => void;
@@ -16,34 +19,30 @@ interface MultiSelectProps {
 }
 
 export const MultiSelect = ({
+    id,
     options,
     value,
     onChange,
     placeholder = 'Select...',
     className,
 }: MultiSelectProps) => {
-    const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState('');
-
-    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [query, setQuery] = useState<string>('');
+    const {
+        open,
+        toggle: togglePopup,
+        close,
+        containerRef,
+        triggerRef,
+        handleKeyDown,
+        handleBlur,
+    } = useDismissiblePopup();
+    const popupId = useId();
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return options;
         return options.filter(o => o.label.toLowerCase().includes(q));
     }, [options, query]);
-
-    // close on outside click
-    useEffect(() => {
-        function onDocClick(e: MouseEvent) {
-            if (!containerRef.current) return;
-            if (e.target instanceof Node && containerRef.current.contains(e.target)) return;
-            setOpen(false);
-        }
-
-        document.addEventListener('mousedown', onDocClick);
-        return () => document.removeEventListener('mousedown', onDocClick);
-    }, []);
 
     const allSelected = value.length > 0 && value.length === options.length;
 
@@ -56,11 +55,21 @@ export const MultiSelect = ({
     const clearAll = () => onChange([]);
 
     return (
-        <div ref={containerRef} className={`relative ${className ?? ''}`}>
+        <div
+            ref={containerRef}
+            className={cn('relative', className)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+        >
             <button
+                ref={triggerRef}
+                id={id}
                 type="button"
-                onClick={() => setOpen(o => !o)}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm hover:bg-accent hover:text-accent-foreground"
+                aria-haspopup="dialog"
+                aria-expanded={open}
+                aria-controls={open ? popupId : undefined}
+                onClick={togglePopup}
+                className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
                 <span className="truncate">
                     {value.length === 0
@@ -73,9 +82,13 @@ export const MultiSelect = ({
             </button>
 
             {open && (
-                <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md">
+                <div
+                    id={popupId}
+                    className="absolute z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md"
+                >
                     <div className="border-b p-2">
                         <input
+                            aria-label="Search options"
                             value={query}
                             onChange={e => setQuery(e.target.value)}
                             placeholder="Search..."
@@ -132,7 +145,7 @@ export const MultiSelect = ({
                                 type="button"
                                 size="sm"
                                 className="h-7 px-2.5 text-xs"
-                                onClick={() => setOpen(false)}
+                                onClick={close}
                             >
                                 Done
                             </Button>

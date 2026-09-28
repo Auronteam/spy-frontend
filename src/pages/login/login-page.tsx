@@ -1,56 +1,23 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import * as z from 'zod';
-import { login } from '@/api/auth';
-import { useAuth } from '@/contexts/auth-context';
-import { isApiError } from '@/lib/errors/api-error';
-import { getHomeRoute } from '@/lib/routes';
+import { Logo } from '@/components/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-
-const loginSchema = z.object({
-    login: z.string().min(1, 'Login is required'),
-    password: z.string().min(1, 'Password is required'),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import { useLogin, type LoginFormValues } from './hooks/use-login';
 
 export const LoginPage = () => {
     const [values, setValues] = useState<LoginFormValues>({ login: '', password: '' });
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
-    const { login: setSession } = useAuth();
+    const { submit, error, isLoading } = useLogin();
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(null);
-
-        const parse = loginSchema.safeParse(values);
-        if (!parse.success) {
-            setError(parse.error.issues[0]?.message || 'Invalid data');
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            const { token, user } = await login(parse.data);
-            setSession(token, user);
-            navigate(getHomeRoute(user.role));
-        } catch (err) {
-            setError(isApiError(err) ? err.message : 'An unexpected error occurred');
-        } finally {
-            setIsLoading(false);
-        }
+        void submit(values);
     };
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
-            <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded-sm bg-foreground" />
-                <span className="font-semibold">Spy Console</span>
-            </div>
+            <Logo />
 
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
@@ -60,9 +27,7 @@ export const LoginPage = () => {
                 <CardContent>
                     <form autoComplete="on" className="space-y-4" onSubmit={handleSubmit}>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium" htmlFor="login">
-                                Login
-                            </label>
+                            <Label htmlFor="login">Login</Label>
                             <Input
                                 id="login"
                                 name="username"
@@ -80,9 +45,7 @@ export const LoginPage = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium" htmlFor="password">
-                                Password
-                            </label>
+                            <Label htmlFor="password">Password</Label>
                             <Input
                                 id="password"
                                 name="password"
@@ -97,7 +60,10 @@ export const LoginPage = () => {
                             />
                         </div>
                         {error && (
-                            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md border border-destructive/20">
+                            <div
+                                role="alert"
+                                className="text-sm text-destructive bg-destructive/10 p-3 rounded-md border border-destructive/20"
+                            >
                                 {error}
                             </div>
                         )}

@@ -9,6 +9,7 @@ import { useCategories } from './hooks/use-categories';
 import { CategoryRow } from './components/category-row';
 import { AddCategoryDialog } from './components/add-category-dialog';
 import { EditCategoryDialog } from './components/edit-category-dialog';
+import { DeleteCategoryDialog } from './components/delete-category-dialog';
 
 export const CategoriesPage = () => {
     const {
@@ -16,23 +17,22 @@ export const CategoriesPage = () => {
         isLoading,
         isError,
         error,
+        refetch,
         createCategory,
         isCreating,
         updateCategory,
         isUpdating,
         deleteCategory,
+        isDeleting,
     } = useCategories();
 
     const [addOpen, setAddOpen] = useState(false);
     const [editTarget, setEditTarget] = useState<Category | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
 
-    const handleDelete = (category: Category) => {
-        if (category.protected) return;
-        const confirmed = window.confirm(
-            `Delete category "${category.title}"? This also deletes every post in it.`
-        );
-        if (!confirmed) return;
-        deleteCategory(category.slug);
+    const handleConfirmDelete = () => {
+        if (!deleteTarget || deleteTarget.protected || isDeleting) return;
+        deleteCategory(deleteTarget.slug, { onSuccess: () => setDeleteTarget(null) });
     };
 
     return (
@@ -59,6 +59,7 @@ export const CategoriesPage = () => {
                 }
                 isError={isError}
                 error={error}
+                onRetry={refetch}
                 title="Failed to load categories"
             >
                 <Card className="divide-y p-0">
@@ -70,7 +71,7 @@ export const CategoriesPage = () => {
                                 key={category.slug}
                                 category={category}
                                 onEdit={() => setEditTarget(category)}
-                                onDelete={() => handleDelete(category)}
+                                onDelete={() => setDeleteTarget(category)}
                             />
                         ))
                     )}
@@ -97,6 +98,15 @@ export const CategoriesPage = () => {
                         { onSuccess: () => setEditTarget(null) }
                     );
                 }}
+            />
+
+            <DeleteCategoryDialog
+                category={deleteTarget}
+                onOpenChange={open => {
+                    if (!open) setDeleteTarget(null);
+                }}
+                isPending={isDeleting}
+                onConfirm={handleConfirmDelete}
             />
         </div>
     );

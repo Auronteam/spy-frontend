@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BACKEND_BASE } from '@/config';
+import { getLogStreamUrl } from '@/api/logs';
 import { downloadBlob } from '@/lib/download';
 import { useVisionFolders } from '@/hooks/useVisionFolders';
 import { useVisionProfiles } from '@/hooks/useVisionProfiles';
@@ -10,17 +10,18 @@ import { useSelectedProfileScanner } from './hooks/use-selected-profile-scanner'
 import { ProfileSelector } from './components/profile-selector';
 import { LogFilesList } from './components/log-files-list';
 import { LogContentViewer } from './components/log-content-viewer';
+import { joinLogLines } from './utils';
 
 export const LogsPage = () => {
     const { folders, folderId, setFolderId } = useVisionFolders();
     const { profiles, loading: profilesLoading } = useVisionProfiles(folderId);
 
-    const [selectedProfileId, setSelectedProfileId] = useState('');
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
 
-    const streamUrl = selectedProfileId
-        ? `${BACKEND_BASE}/api/logs/stream?profileId=${encodeURIComponent(selectedProfileId)}`
-        : '';
-    const { isLiveMode, isConnected, liveLogContent, toggleLiveMode } = useLogStream(streamUrl);
+    const streamUrl = selectedProfileId ? getLogStreamUrl(selectedProfileId) : '';
+    const { isLiveMode, isConnected, liveLogLines, toggleLiveMode } = useLogStream(streamUrl, {
+        onGiveUp: () => refetchFiles(),
+    });
     const { isRunning: isScannerRunning } = useSelectedProfileScanner(selectedProfileId);
 
     const handleProfileChange = (value: string) => {
@@ -30,7 +31,15 @@ export const LogsPage = () => {
         if (isLiveMode) {
             toggleLiveMode();
         }
-        setSelectedProfileId(value);
+        setSelectedProfileId(value || null);
+    };
+
+    const handleFolderChange = (value: string) => {
+        if (isLiveMode) {
+            toggleLiveMode();
+        }
+        setSelectedProfileId(null);
+        setFolderId(value);
     };
 
     const {
@@ -39,18 +48,19 @@ export const LogsPage = () => {
         selectedFile,
         setSelectedFile,
         content: logContent,
+        contentLines: logLines,
         contentLoading,
         refetchFiles,
-    } = useProfileLogFiles(selectedProfileId || null, isLiveMode);
+    } = useProfileLogFiles(selectedProfileId, isLiveMode);
 
     const { liveLogRef, staticLogRef, handleScroll } = useLogAutoScroll({
         isLiveMode,
-        liveLogContent,
-        logContent,
+        liveLogLines,
+        logLines,
     });
 
     const handleDownload = () => {
-        const content = isLiveMode ? liveLogContent : logContent;
+        const content = isLiveMode ? joinLogLines(liveLogLines) : logContent;
         const fileName = isLiveMode ? 'live-logs.log' : selectedFile;
 
         if (!fileName || !content) return;
@@ -68,7 +78,7 @@ export const LogsPage = () => {
             <ProfileSelector
                 folders={folders}
                 folderId={folderId}
-                onFolderChange={setFolderId}
+                onFolderChange={handleFolderChange}
                 profiles={profiles}
                 profilesLoading={profilesLoading}
                 selectedProfileId={selectedProfileId}
@@ -88,7 +98,7 @@ export const LogsPage = () => {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[264px_minmax(0,1fr)]">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-logs-layout">
                     <LogFilesList
                         files={logFiles}
                         filesLoading={filesLoading}
@@ -101,8 +111,8 @@ export const LogsPage = () => {
                         isLiveMode={isLiveMode}
                         isConnected={isConnected}
                         isScannerRunning={isScannerRunning}
-                        liveLogContent={liveLogContent}
-                        logContent={logContent}
+                        liveLogLines={liveLogLines}
+                        logLines={logLines}
                         contentLoading={contentLoading}
                         liveLogRef={liveLogRef}
                         staticLogRef={staticLogRef}

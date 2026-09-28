@@ -1,15 +1,20 @@
 import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getCategoriesList } from '@/api/db/categories';
+import { getCategoriesWithPosts } from '@/api/db/categories';
 import { getCountriesList } from '@/api/db/countries';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
 import type { MultiSelectOption } from '../components/multiselect';
 
-export function useFiltersOptions() {
+export type UseFiltersOptionsResult = {
+    categoriesOptions: MultiSelectOption[];
+    countriesOptions: MultiSelectOption[];
+};
+
+export function useFiltersOptions(): UseFiltersOptionsResult {
     const categoriesQuery = useQuery({
-        queryKey: queryKeys.categories.list(),
-        queryFn: getCategoriesList,
+        queryKey: queryKeys.categories.withPosts(),
+        queryFn: getCategoriesWithPosts,
     });
     const countriesQuery = useQuery({
         queryKey: queryKeys.countries.list(),
@@ -43,9 +48,5 @@ export function useFiltersOptions() {
         [countriesQuery.data]
     );
 
-    return {
-        categoriesOptions,
-        countriesOptions,
-        loading: categoriesQuery.isLoading || countriesQuery.isLoading,
-    };
+    return { categoriesOptions, countriesOptions };
 }

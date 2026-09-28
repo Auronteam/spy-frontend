@@ -1,15 +1,18 @@
-import type { Filters } from '@/pages/content/hooks/useFilters';
-import type { Post } from '@/pages/content/types';
+import type { Post, PostFilters } from '@/api/db/types';
 import { mapPostDtoToPost } from '@/api/db/adapters';
 import type { PagedResponse, PostDto } from '@/api/db/dto';
 import { apiFetch } from '@/lib/api-fetch';
 
-export type { PagedResponse } from '@/api/db/dto';
+function endOfLocalDay(date: Date): Date {
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+    return end;
+}
 
 export async function fetchPosts(
     page = 1,
     pageSize = 24,
-    filters?: Filters
+    filters?: PostFilters
 ): Promise<PagedResponse<Post>> {
     const params = new URLSearchParams({
         page: String(page),
@@ -18,7 +21,9 @@ export async function fetchPosts(
 
     if (filters) {
         if (filters.createdAt?.from) params.append('from', filters.createdAt.from.toISOString());
-        if (filters.createdAt?.to) params.append('to', filters.createdAt.to.toISOString());
+        if (filters.createdAt?.to) {
+            params.append('to', endOfLocalDay(filters.createdAt.to).toISOString());
+        }
 
         Object.entries(filters).forEach(([key, values]) => {
             if (key === 'createdAt' || !values) return;

@@ -1,16 +1,21 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type UseMutateFunction } from '@tanstack/react-query';
 import { updateVisionProfile } from '@/api/vision-browser';
 import { isApiError } from '@/lib/errors/api-error';
 import { notifyError } from '@/lib/errors/notify-error';
 import { queryKeys } from '@/lib/query-keys';
-import type { UpdateProfileInput } from '@/pages/profiles/types';
+import type { UpdateProfileInput } from '@/api/vision-browser/types';
 
 type UpdateProfileVariables = {
     profileId: string;
     input: UpdateProfileInput;
 };
 
-export function useUpdateProfile(folderId: string | null) {
+type UseUpdateProfileResult = {
+    updateProfile: UseMutateFunction<Record<string, unknown>, Error, UpdateProfileVariables>;
+    isUpdating: boolean;
+};
+
+export function useUpdateProfile(folderId: string | null): UseUpdateProfileResult {
     const queryClient = useQueryClient();
 
     const invalidateProfiles = () =>
