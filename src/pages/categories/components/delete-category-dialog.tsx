@@ -38,7 +38,8 @@ export const DeleteCategoryDialog = ({
                 <DialogHeader>
                     <DialogTitle>Delete category "{title}"?</DialogTitle>
                     <DialogDescription>
-                        This also deletes every post in it. This cannot be undone.
+                        The category will no longer be used for search. Existing content keeps it.
+                        To bring it back, create a category with the same slug.
                     </DialogDescription>
                 </DialogHeader>
 

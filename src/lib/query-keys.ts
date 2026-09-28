@@ -17,6 +17,7 @@ export const queryKeys = {
     categories: {
         all: () => ['categories'] as const,
         list: () => [...queryKeys.categories.all(), 'list'] as const,
+        withPosts: () => [...queryKeys.categories.all(), 'with-posts'] as const,
     },
     countries: {
         list: () => ['countries', 'list'] as const,

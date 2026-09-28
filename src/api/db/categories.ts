@@ -7,7 +7,10 @@ export type Category = {
     slug: string;
     title: string;
     protected: boolean;
+    search_enabled: boolean;
 };
+
+const MAX_PAGE_SIZE = 100;
 
 export async function fetchCategories(
     page = 1,
@@ -29,9 +32,18 @@ export async function fetchCategories(
 }
 
 export async function getCategoriesList(): Promise<Category[]> {
-    const data = await apiFetch<PagedResponse<Category>>('/api/categories?pageSize=1000', {
-        cache: 'no-store',
-    });
+    const data = await apiFetch<PagedResponse<Category>>(
+        `/api/categories?pageSize=${MAX_PAGE_SIZE}`,
+        { cache: 'no-store' }
+    );
+    return data.items;
+}
+
+export async function getCategoriesWithPosts(): Promise<Category[]> {
+    const data = await apiFetch<PagedResponse<Category>>(
+        `/api/categories?scope=with-posts&pageSize=${MAX_PAGE_SIZE}`,
+        { cache: 'no-store' }
+    );
     return data.items;
 }
 

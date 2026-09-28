@@ -31,10 +31,7 @@ export function useCategories() {
 
     const deleteMutation = useMutation({
         mutationFn: deleteCategory,
-        onSuccess: () => {
-            invalidate();
-            queryClient.invalidateQueries({ queryKey: queryKeys.posts.all() });
-        },
+        onSuccess: invalidate,
     });
 
     return {
